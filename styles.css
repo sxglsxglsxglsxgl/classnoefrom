@@ -6,7 +6,7 @@
   --text-subtle: rgba(255, 255, 255, 0.5);
   --text-faint: rgba(255, 255, 255, 0.2);
   --font-serif: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
-  --font-sans: 'Futura PT', 'Futura', 'Century Gothic', 'Avenir Next', 'Avenir', 'Nunito Sans', 'Inter', sans-serif;
+  --font-sans: 'Gotham', 'Gotham SSm A', 'Gotham SSm B', 'Avenir Next', 'Avenir', 'Nunito Sans', 'Inter', sans-serif;
 }
 
 *,
@@ -126,7 +126,8 @@ main::after {
   pointer-events: auto;
 }
 
-.site-brand {
+.site-brand,
+.site-meta {
   font-family: var(--font-sans);
   font-size: clamp(18px, 1.6vw, 28px);
   font-weight: 500;
@@ -139,11 +140,6 @@ main::after {
   display: inline-flex;
   align-items: center;
   gap: clamp(10px, 1.6vw, 24px);
-  font-family: var(--font-sans);
-  font-size: clamp(11px, 0.9vw, 14px);
-  letter-spacing: 0.36em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.95);
   white-space: nowrap;
 }
 

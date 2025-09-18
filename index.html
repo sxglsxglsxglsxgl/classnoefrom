@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Classnoe Mesto</title>
+  <meta name="description" content="A conceptual space. Scroll narrative." />
+  <meta property="og:title" content="Classnoe Mesto" />
+  <meta property="og:description" content="A conceptual space. Scroll narrative." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#1c1c1c" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <button
+    class="menu-toggle"
+    type="button"
+    aria-controls="site-menu"
+    aria-expanded="false"
+    data-menu-toggle
+  >
+    <span class="menu-toggle__icon" aria-hidden="true">
+      <span class="menu-toggle__bar"></span>
+      <span class="menu-toggle__bar"></span>
+      <span class="menu-toggle__bar"></span>
+    </span>
+    <span class="visually-hidden" data-menu-toggle-label>Открыть меню</span>
+  </button>
+
+  <div
+    class="menu-overlay"
+    id="site-menu"
+    data-menu-overlay
+    aria-hidden="true"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="site-menu-title"
+  >
+    <nav class="menu-overlay__nav" aria-labelledby="site-menu-title">
+      <h2 class="visually-hidden" id="site-menu-title">Навигация</h2>
+      <ul class="menu-overlay__list">
+        <li>
+          <a class="menu-overlay__link" href="#menu" data-menu-link data-menu-initial-focus>Меню</a>
+        </li>
+        <li>
+          <a class="menu-overlay__link" href="#booking" data-menu-link>Бронь</a>
+        </li>
+        <li>
+          <a class="menu-overlay__link" href="#history" data-menu-link>История</a>
+        </li>
+        <li>
+          <a class="menu-overlay__link" href="#contacts" data-menu-link>Контакты</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Intro screen: centered title that scrolls away naturally -->
+  <section id="intro" aria-label="Intro">
+    <h1>Classnoe Mesto</h1>
+  </section>
+
+  <!-- Scroll content; text appears progressively, sentence by sentence -->
+  <main>
+    <section id="scroll-zone" aria-label="Scroll narrative">
+      <div id="sentences" role="list"></div>
+    </section>
+  </main>
+
+  <script>
+    // === EDIT TEXT HERE (English copy) ===
+    const SENTENCES = [
+      "Мы начали с вопроса, который беспокоил нас самих: что действительно нужно человеку?",
+      "Не каждому. Только тем, кто выбирает ясность вместо шума.",
+      "Будущее дало ответ: энергия, фокус, равновесие.",
+      "Мы верим, что спокойствие и явность — это новая роскошь. Жизнь можно проектировать.",
+      "Здоровье и фокус — это не случайность, а выбор, который вы делаете каждый день.",
+      "Раньше люди искали смысл. Сегодня мы ищем фокус."
+    ];
+    window.SITE_CONFIG = { SENTENCES };
+  </script>
+  <script defer src="./script.js"></script>
+</body>
+</html>

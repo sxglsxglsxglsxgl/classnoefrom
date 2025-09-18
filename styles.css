@@ -6,7 +6,7 @@
   --text-subtle: rgba(255, 255, 255, 0.5);
   --text-faint: rgba(255, 255, 255, 0.2);
   --font-serif: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
-  --font-sans: 'Jost', 'Futura PT', 'Futura', 'Century Gothic', 'Avenir Next', 'Avenir', 'Nunito Sans', 'Inter', sans-serif;
+  --font-sans: 'Futura PT', 'Futura', 'Century Gothic', 'Avenir Next', 'Avenir', 'Nunito Sans', 'Inter', sans-serif;
 }
 
 *,
@@ -132,7 +132,7 @@ main::after {
   font-weight: 500;
   letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.99);
+  color: #ffffff;
 }
 
 .site-meta {
@@ -143,7 +143,7 @@ main::after {
   font-size: clamp(11px, 0.9vw, 14px);
   letter-spacing: 0.36em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.95);
   white-space: nowrap;
 }
 

@@ -131,7 +131,7 @@ main::after {
   font-family: var(--font-sans);
   font-size: clamp(18px, 1.6vw, 28px);
   font-weight: 500;
-  letter-spacing: 0.32em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.995);
   text-shadow: 0 0 28px rgba(255, 255, 255, 0.36);

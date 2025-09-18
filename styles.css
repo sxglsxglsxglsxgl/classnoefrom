@@ -6,7 +6,7 @@
   --text-subtle: rgba(255, 255, 255, 0.5);
   --text-faint: rgba(255, 255, 255, 0.2);
   --font-serif: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
-  --font-sans: 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
+  --font-sans: 'Jost', 'Futura PT', 'Futura', 'Century Gothic', 'Avenir Next', 'Avenir', 'Nunito Sans', 'Inter', sans-serif;
 }
 
 *,

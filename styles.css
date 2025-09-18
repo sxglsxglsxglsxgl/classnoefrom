@@ -1,12 +1,12 @@
 :root {
   color-scheme: dark;
   --background: #050505;
-  --text-strong: rgba(255, 255, 255, 0.98);
-  --text-muted: rgba(255, 255, 255, 0.82);
-  --text-subtle: rgba(255, 255, 255, 0.5);
-  --text-faint: rgba(255, 255, 255, 0.2);
+  --text-strong: rgba(255, 255, 255, 0.995);
+  --text-muted: rgba(255, 255, 255, 0.88);
+  --text-subtle: rgba(255, 255, 255, 0.6);
+  --text-faint: rgba(255, 255, 255, 0.26);
   --font-serif: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
-  --font-sans: 'Gotham', 'Gotham SSm A', 'Gotham SSm B', 'Avenir Next', 'Avenir', 'Nunito Sans', 'Inter', sans-serif;
+  --font-sans: 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
 }
 
 *,
@@ -133,7 +133,8 @@ main::after {
   font-weight: 500;
   letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: #ffffff;
+  color: rgba(255, 255, 255, 0.995);
+  text-shadow: 0 0 28px rgba(255, 255, 255, 0.36);
 }
 
 .site-meta {

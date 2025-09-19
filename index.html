@@ -9,12 +9,6 @@
   <meta property="og:description" content="An homage to CLASSNOE MESTO's scrolling narrative experience." />
   <meta property="og:type" content="website" />
   <meta name="theme-color" content="#0b0b0b" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap"
-    rel="stylesheet"
-  />
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
@@ -22,12 +16,95 @@
 
   <header class="site-header">
     <div class="site-header__inner">
-      <div class="site-brand" aria-label="CLASSNOE MESTO">CLASSNOE MESTO</div>
-      <div class="site-meta" aria-hidden="true">
-        <span>Saint Petersburg</span>
+      <div class="site-lockup">
+        <div class="site-brand" aria-label="CLASSNOE MESTO">CLASSNOE MESTO</div>
+        <div class="site-location">Saint Petersburg</div>
       </div>
+      <button
+        class="menu-toggle"
+        type="button"
+        data-menu-toggle
+        aria-expanded="false"
+        aria-controls="site-menu"
+      >
+        <span class="menu-toggle__label">Menu</span>
+        <span class="menu-toggle__icon" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </button>
     </div>
   </header>
+
+  <div
+    id="site-menu"
+    class="site-menu"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Site navigation"
+    aria-hidden="true"
+    hidden
+  >
+    <div class="site-menu__backdrop" data-menu-close></div>
+    <div class="site-menu__container" role="document" tabindex="-1">
+      <button class="site-menu__close" type="button" data-menu-close aria-label="Close menu">
+        <span aria-hidden="true">Close</span>
+      </button>
+      <nav class="site-menu__nav" aria-label="Primary">
+        <ul class="site-menu__list" role="list">
+          <li class="site-menu__item">
+            <span class="site-menu__index">(01)</span>
+            <a href="#content" class="site-menu__link" data-menu-link data-menu-focus>Branding</a>
+            <div class="site-menu__details">
+              <span class="site-menu__subtitle">Brand strategy · Identity</span>
+              <span class="site-menu__note">&amp; Best seller brand to social</span>
+            </div>
+          </li>
+          <li class="site-menu__item">
+            <span class="site-menu__index">(02)</span>
+            <a href="#content" class="site-menu__link" data-menu-link>Packaging</a>
+            <div class="site-menu__details">
+              <span class="site-menu__subtitle">Design systems · Production</span>
+              <span class="site-menu__note">Seasonal & bespoke drops</span>
+            </div>
+          </li>
+          <li class="site-menu__item">
+            <span class="site-menu__index">(03)</span>
+            <a href="#content" class="site-menu__link" data-menu-link>Social Media</a>
+            <div class="site-menu__details">
+              <span class="site-menu__subtitle">Monthly design · Management</span>
+              <span class="site-menu__note">For launch & live campaigns</span>
+            </div>
+          </li>
+          <li class="site-menu__item">
+            <span class="site-menu__index">(04)</span>
+            <a href="#content" class="site-menu__link" data-menu-link>Templates</a>
+            <div class="site-menu__details">
+              <span class="site-menu__subtitle">Custom libraries · Toolkits</span>
+              <span class="site-menu__note">On-brand for rapid teams</span>
+            </div>
+          </li>
+          <li class="site-menu__item">
+            <span class="site-menu__index">(05)</span>
+            <a href="#content" class="site-menu__link" data-menu-link>Web Design</a>
+            <div class="site-menu__details">
+              <span class="site-menu__subtitle">Squarespace · Shopify · Webflow</span>
+              <span class="site-menu__note">Seamless brand to web</span>
+            </div>
+          </li>
+          <li class="site-menu__item">
+            <span class="site-menu__index">(06)</span>
+            <a href="#content" class="site-menu__link" data-menu-link>Monthly Design</a>
+            <div class="site-menu__details">
+              <span class="site-menu__subtitle">Ongoing support retainers</span>
+              <span class="site-menu__note">For brand evolutions</span>
+            </div>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
 
   <main id="content" aria-labelledby="content-title">
     <h1 id="content-title" class="visually-hidden">CLASSNOE MESTO inspired narrative</h1>

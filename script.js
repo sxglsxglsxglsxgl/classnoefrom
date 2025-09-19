@@ -84,3 +84,141 @@
   window.addEventListener('scroll', requestUpdate, { passive: true });
   window.addEventListener('resize', requestUpdate);
 })();
+
+(function () {
+  const toggle = document.querySelector('[data-menu-toggle]');
+  const menu = document.getElementById('site-menu');
+  if (!toggle || !menu) return;
+
+  const menuContainer = menu.querySelector('.site-menu__container');
+  const menuCloseTargets = menu.querySelectorAll('[data-menu-close]');
+  const menuLinks = menu.querySelectorAll('[data-menu-link]');
+  const focusAnchor = menu.querySelector('[data-menu-focus]');
+  const toggleLabel = toggle.querySelector('.menu-toggle__label');
+
+  let lastFocusedElement = null;
+
+  function getFocusableElements() {
+    const selectors = [
+      'a[href]',
+      'button:not([disabled])',
+      '[tabindex]:not([tabindex="-1"])'
+    ];
+    return Array.from(menu.querySelectorAll(selectors.join(','))).filter((element) => {
+      const isHidden = element.hasAttribute('hidden') || element.getAttribute('aria-hidden') === 'true';
+      const isDisabled = element.getAttribute('aria-disabled') === 'true';
+      const rect = element.getBoundingClientRect();
+      const isVisible = rect.width > 0 && rect.height > 0;
+      return !isHidden && !isDisabled && isVisible;
+    });
+  }
+
+  function trapFocus(event) {
+    if (event.key !== 'Tab') return;
+
+    const focusable = getFocusableElements();
+    if (focusable.length === 0) {
+      event.preventDefault();
+      return;
+    }
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (event.shiftKey) {
+      if (document.activeElement === first || !menu.contains(document.activeElement)) {
+        event.preventDefault();
+        last.focus();
+      }
+    } else if (document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
+  function handleKeydown(event) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeMenu();
+      return;
+    }
+
+    trapFocus(event);
+  }
+
+  function setExpandedState(isExpanded) {
+    toggle.setAttribute('aria-expanded', String(isExpanded));
+    if (toggleLabel) {
+      toggleLabel.textContent = isExpanded ? 'Close' : 'Menu';
+    }
+  }
+
+  function focusInitialElement() {
+    const focusTarget = focusAnchor || menuContainer || menu;
+    requestAnimationFrame(() => {
+      (focusTarget instanceof HTMLElement ? focusTarget : menu).focus();
+    });
+  }
+
+  function openMenu() {
+    if (document.body.classList.contains('menu-open')) return;
+
+    lastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    menu.removeAttribute('hidden');
+    menu.removeAttribute('aria-hidden');
+
+    requestAnimationFrame(() => {
+      document.body.classList.add('menu-open');
+      setExpandedState(true);
+      focusInitialElement();
+    });
+
+    document.addEventListener('keydown', handleKeydown);
+  }
+
+  function closeMenu({ focusToggle = true } = {}) {
+    if (!document.body.classList.contains('menu-open')) return;
+
+    document.body.classList.remove('menu-open');
+    setExpandedState(false);
+    document.removeEventListener('keydown', handleKeydown);
+
+    const handleTransitionEnd = (event) => {
+      if (event.target !== menu || document.body.classList.contains('menu-open')) return;
+      menu.setAttribute('hidden', '');
+      menu.setAttribute('aria-hidden', 'true');
+    };
+
+    menu.addEventListener('transitionend', handleTransitionEnd, { once: true });
+
+    const focusTarget = focusToggle
+      ? toggle
+      : lastFocusedElement && lastFocusedElement !== toggle && document.body.contains(lastFocusedElement)
+        ? lastFocusedElement
+        : null;
+
+    if (focusTarget && typeof focusTarget.focus === 'function') {
+      focusTarget.focus();
+    }
+  }
+
+  toggle.addEventListener('click', () => {
+    if (document.body.classList.contains('menu-open')) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  });
+
+  menuCloseTargets.forEach((element) => {
+    element.addEventListener('click', () => {
+      closeMenu();
+    });
+  });
+
+  menuLinks.forEach((link) => {
+    link.addEventListener('click', () => {
+      closeMenu({ focusToggle: false });
+    });
+  });
+})();

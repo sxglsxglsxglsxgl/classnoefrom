@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700&display=swap"
     rel="stylesheet"
   />
   <link rel="stylesheet" href="./styles.css" />
@@ -22,12 +22,61 @@
 
   <header class="site-header">
     <div class="site-header__inner">
-      <div class="site-brand" aria-label="CLASSNOE MESTO">CLASSNOE MESTO</div>
-      <div class="site-meta" aria-hidden="true">
-        <span>Saint Petersburg</span>
+      <div class="site-lockup">
+        <span class="site-brand">CLASSNOE MESTO</span>
       </div>
+      <button
+        class="site-menu-toggle"
+        type="button"
+        data-menu-toggle
+        aria-expanded="false"
+        aria-controls="site-menu"
+        aria-label="Open menu"
+      >
+        <span class="site-menu-toggle__icon" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </button>
     </div>
   </header>
+
+  <div
+    id="site-menu"
+    class="site-menu"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Site navigation"
+    aria-hidden="true"
+    hidden
+  >
+    <div class="site-menu__backdrop" data-menu-close></div>
+    <div class="site-menu__container" role="document" tabindex="-1" data-menu-focus>
+      <nav class="site-menu__nav" aria-label="Primary">
+        <ul class="site-menu__list" role="list">
+          <li class="site-menu__item">
+            <a href="#content" class="site-menu__link" data-menu-link>Branding</a>
+          </li>
+          <li class="site-menu__item">
+            <a href="#content" class="site-menu__link" data-menu-link>Packaging</a>
+          </li>
+          <li class="site-menu__item">
+            <a href="#content" class="site-menu__link" data-menu-link>Social Media</a>
+          </li>
+          <li class="site-menu__item">
+            <a href="#content" class="site-menu__link" data-menu-link>Templates</a>
+          </li>
+          <li class="site-menu__item">
+            <a href="#content" class="site-menu__link" data-menu-link>Web Design</a>
+          </li>
+          <li class="site-menu__item">
+            <a href="#content" class="site-menu__link" data-menu-link>Monthly Design</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
 
   <main id="content" aria-labelledby="content-title">
     <h1 id="content-title" class="visually-hidden">CLASSNOE MESTO inspired narrative</h1>

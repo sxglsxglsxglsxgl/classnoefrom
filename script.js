@@ -312,30 +312,80 @@
 
   if (!trigger || !container) return;
 
+  function getAbsoluteOffsetTop(element) {
+    let current = element;
+    let offset = 0;
+
+    while (current) {
+      offset += current.offsetTop || 0;
+      current = current.offsetParent;
+    }
+
+    return offset;
+  }
+
+  function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+  }
+
+  function animateScrollTo(top, duration) {
+    const start = window.scrollY || window.pageYOffset || 0;
+    const distance = top - start;
+    if (distance === 0 || duration <= 0) {
+      window.scrollTo(0, top);
+      return;
+    }
+
+    const startTime = performance.now();
+
+    const easeInOutCubic = (t) =>
+      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+    function step(now) {
+      const elapsed = now - startTime;
+      const progress = clamp(elapsed / duration, 0, 1);
+      const eased = easeInOutCubic(progress);
+      window.scrollTo(0, Math.round(start + distance * eased));
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      }
+    }
+
+    requestAnimationFrame(step);
+  }
+
   function scrollToSentences() {
     const target = container.querySelector('.sentence') || container;
     const prefersReducedMotion =
       window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    if (typeof target.scrollIntoView === 'function') {
-      target.scrollIntoView({
-        behavior: prefersReducedMotion ? 'auto' : 'smooth',
-        block: 'center'
-      });
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+    const targetHeight = target.offsetHeight || target.getBoundingClientRect().height || 0;
+    const documentHeight = Math.max(
+      document.body.scrollHeight,
+      document.documentElement.scrollHeight,
+      document.body.offsetHeight,
+      document.documentElement.offsetHeight,
+      document.body.clientHeight,
+      document.documentElement.clientHeight
+    );
+
+    const maxScroll = Math.max(0, documentHeight - viewportHeight);
+
+    let destination = getAbsoluteOffsetTop(target);
+
+    if (targetHeight < viewportHeight) {
+      destination -= (viewportHeight - targetHeight) / 2;
+    }
+
+    destination = clamp(destination, 0, maxScroll);
+
+    if (prefersReducedMotion) {
+      window.scrollTo({ top: destination, behavior: 'auto' });
       return;
     }
 
-    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
-    const targetRect = target.getBoundingClientRect();
-    const targetCenterOffset = targetRect.height / 2;
-    const top =
-      window.scrollY +
-      targetRect.top -
-      Math.max(0, viewportHeight / 2 - targetCenterOffset);
-    window.scrollTo({
-      top,
-      behavior: prefersReducedMotion ? 'auto' : 'smooth'
-    });
+    animateScrollTo(destination, 700);
   }
 
   trigger.addEventListener('click', scrollToSentences);

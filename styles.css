@@ -5,6 +5,8 @@
   --text-muted: rgba(255, 255, 255, 0.88);
   --text-subtle: rgba(255, 255, 255, 0.6);
   --text-faint: rgba(255, 255, 255, 0.26);
+  --font-brand: 'Outfit', 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont,
+    'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
   --font-serif: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
   --font-sans: 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
 }
@@ -112,6 +114,9 @@ body.has-menu-open .backdrop {
   z-index: 10;
   opacity: 0;
   pointer-events: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   transition: opacity 260ms ease;
 }
 
@@ -139,6 +144,7 @@ body.has-menu-open .site-menu,
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 32px 120px rgba(0, 0, 0, 0.6);
   pointer-events: auto;
+  margin-block: clamp(40px, 10vh, 160px);
 }
 
 .site-menu__header {
@@ -316,13 +322,13 @@ main::after {
 }
 
 .site-brand {
-  font-family: var(--font-sans);
-  font-size: clamp(24px, 2.3vw, 40px);
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-family: var(--font-brand);
+  font-size: clamp(24px, 2.5vw, 44px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.995);
-  text-shadow: 0 0 20px rgba(255, 255, 255, 0.32);
+  text-shadow: 0 0 32px rgba(255, 255, 255, 0.28);
 }
 
 .site-menu-toggle {

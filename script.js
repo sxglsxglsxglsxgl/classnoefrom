@@ -265,7 +265,7 @@
           finalizeHide();
         }
         hideTimeoutId = null;
-      }, 760);
+      }, 500);
     }
 
     if (focusToggle) {

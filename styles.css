@@ -39,7 +39,8 @@ body {
   overflow-x: hidden;
 }
 
-body.has-menu-open {
+body.has-menu-open,
+body.is-menu-closing {
   overflow: hidden;
 }
 
@@ -101,7 +102,10 @@ footer,
 
 body.has-menu-open main,
 body.has-menu-open footer,
-body.has-menu-open .backdrop {
+body.has-menu-open .backdrop,
+body.is-menu-closing main,
+body.is-menu-closing footer,
+body.is-menu-closing .backdrop {
   filter: blur(28px);
   opacity: 0.2;
 }
@@ -148,6 +152,11 @@ body.has-menu-open .site-menu,
   box-shadow: 0 32px 120px rgba(0, 0, 0, 0.6);
   pointer-events: auto;
   margin-block: clamp(40px, 10vh, 160px);
+}
+
+.site-menu__container:focus,
+.site-menu__container:focus-visible {
+  outline: none;
 }
 
 .site-menu__nav {

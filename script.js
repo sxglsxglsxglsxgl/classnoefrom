@@ -199,6 +199,8 @@
       pendingTransitionHandler = null;
     }
 
+    document.body.classList.remove('is-menu-closing');
+
     menu.hidden = false;
     menu.removeAttribute('hidden');
     menu.setAttribute('aria-hidden', 'false');
@@ -214,6 +216,7 @@
   function closeMenu({ focusToggle = true } = {}) {
     if (!document.body.classList.contains('has-menu-open')) return;
 
+    document.body.classList.add('is-menu-closing');
     document.body.classList.remove('has-menu-open');
     menu.classList.remove('is-open');
     menu.setAttribute('aria-hidden', 'true');
@@ -223,6 +226,7 @@
     const finalizeHide = () => {
       menu.setAttribute('hidden', '');
       menu.hidden = true;
+      document.body.classList.remove('is-menu-closing');
     };
 
     const prefersReducedMotion =

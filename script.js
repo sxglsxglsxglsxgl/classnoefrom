@@ -21,6 +21,8 @@
   let activeIndex = -1;
   let ticking = false;
 
+  applyStates(activeIndex);
+
   function applyStates(currentIndex) {
     nodes.forEach((node, index) => {
       const isActive = index === currentIndex;
@@ -42,31 +44,33 @@
   }
 
   function updateActiveSentence() {
-    const viewportCenter = window.innerHeight / 2;
-    let closestIndex = -1;
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+    const viewportCenter = viewportHeight / 2;
+    let nextIndex = -1;
     let smallestDistance = Infinity;
 
     nodes.forEach((node, index) => {
       const rect = node.getBoundingClientRect();
+      const isIntersecting = rect.bottom > 0 && rect.top < viewportHeight;
+
+      if (!isIntersecting) {
+        return;
+      }
+
       const nodeCenter = rect.top + rect.height / 2;
       const distance = Math.abs(nodeCenter - viewportCenter);
 
       if (distance < smallestDistance) {
         smallestDistance = distance;
-        closestIndex = index;
+        nextIndex = index;
       }
     });
 
-    if (closestIndex === -1) return;
-
-    if (!revealed.has(closestIndex)) {
-      revealed.add(closestIndex);
+    if (activeIndex !== nextIndex) {
+      activeIndex = nextIndex;
     }
 
-    if (activeIndex !== closestIndex) {
-      activeIndex = closestIndex;
-      applyStates(activeIndex);
-    }
+    applyStates(activeIndex);
   }
 
   function requestUpdate() {
@@ -78,8 +82,7 @@
     });
   }
 
-  updateActiveSentence();
-  requestAnimationFrame(updateActiveSentence);
+  requestUpdate();
 
   window.addEventListener('scroll', requestUpdate, { passive: true });
   window.addEventListener('resize', requestUpdate);
@@ -315,13 +318,22 @@
     if (typeof target.scrollIntoView === 'function') {
       target.scrollIntoView({
         behavior: prefersReducedMotion ? 'auto' : 'smooth',
-        block: 'start'
+        block: 'center'
       });
       return;
     }
 
-    const top = window.scrollY + target.getBoundingClientRect().top;
-    window.scrollTo({ top, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+    const targetRect = target.getBoundingClientRect();
+    const targetCenterOffset = targetRect.height / 2;
+    const top =
+      window.scrollY +
+      targetRect.top -
+      Math.max(0, viewportHeight / 2 - targetCenterOffset);
+    window.scrollTo({
+      top,
+      behavior: prefersReducedMotion ? 'auto' : 'smooth'
+    });
   }
 
   trigger.addEventListener('click', scrollToSentences);

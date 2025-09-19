@@ -307,14 +307,15 @@ body.is-menu-closing .site-lockup {
   appearance: none;
   cursor: pointer;
   font-family: var(--font-brand);
-  font-size: clamp(48px, 12vw, 128px);
+  font-size: clamp(24px, 6vw, 64px);
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   line-height: 1.05;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.995);
   text-shadow: 0 0 32px rgba(255, 255, 255, 0.28);
   text-align: center;
+  white-space: nowrap;
   transition: color 200ms ease;
 }
 
@@ -527,8 +528,8 @@ body.is-menu-closing .site-menu-toggle__icon span:nth-child(3) {
   }
 
   .site-brand {
-    font-size: clamp(52px, 20vw, 88px);
-    letter-spacing: 0.1em;
+    font-size: clamp(26px, 10vw, 44px);
+    letter-spacing: 0.06em;
   }
 
   .site-menu-toggle {

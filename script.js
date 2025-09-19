@@ -166,15 +166,19 @@
     if (document.body.classList.contains('menu-open')) return;
 
     lastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
     if (hideTimeoutId !== null) {
       window.clearTimeout(hideTimeoutId);
       hideTimeoutId = null;
     }
+
     menu.hidden = false;
+    menu.removeAttribute('hidden');
     menu.setAttribute('aria-hidden', 'false');
 
     document.body.classList.add('menu-open');
     menu.classList.add('is-open');
+
     setExpandedState(true);
     focusInitialElement();
 
@@ -190,25 +194,35 @@
     setExpandedState(false);
     document.removeEventListener('keydown', handleKeydown);
 
-    const hideMenu = (event) => {
-      if (event && event.target !== menu) return;
-      menu.removeEventListener('transitionend', hideMenu);
-      if (hideTimeoutId !== null) {
-        window.clearTimeout(hideTimeoutId);
-        hideTimeoutId = null;
-      }
-      if (menu.classList.contains('is-open')) return;
+    const prefersReducedMotion =
+      window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const finalizeHide = () => {
+      menu.setAttribute('hidden', '');
       menu.hidden = true;
     };
 
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      hideMenu();
+    if (prefersReducedMotion) {
+      finalizeHide();
     } else {
-      menu.addEventListener('transitionend', hideMenu);
+      const handleTransitionEnd = (event) => {
+        if (event.target !== menu || event.propertyName !== 'opacity') return;
+        menu.removeEventListener('transitionend', handleTransitionEnd);
+        if (hideTimeoutId !== null) {
+          window.clearTimeout(hideTimeoutId);
+          hideTimeoutId = null;
+        }
+        if (!document.body.classList.contains('menu-open') && !menu.classList.contains('is-open')) {
+          finalizeHide();
+        }
+      };
+
+      menu.addEventListener('transitionend', handleTransitionEnd);
       hideTimeoutId = window.setTimeout(() => {
-        hideMenu();
+        menu.removeEventListener('transitionend', handleTransitionEnd);
+        finalizeHide();
         hideTimeoutId = null;
-      }, 320);
+      }, 400);
     }
 
     const focusTarget = focusToggle

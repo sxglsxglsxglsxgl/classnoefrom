@@ -97,6 +97,7 @@
   const toggleLabel = toggle.querySelector('.menu-toggle__label');
 
   let lastFocusedElement = null;
+  let hideTimeoutId = null;
 
   function getFocusableElements() {
     const selectors = [
@@ -155,8 +156,9 @@
 
   function focusInitialElement() {
     const focusTarget = focusAnchor || menuContainer || menu;
+    const target = focusTarget instanceof HTMLElement ? focusTarget : menu;
     requestAnimationFrame(() => {
-      (focusTarget instanceof HTMLElement ? focusTarget : menu).focus();
+      target.focus();
     });
   }
 
@@ -164,14 +166,17 @@
     if (document.body.classList.contains('menu-open')) return;
 
     lastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    menu.removeAttribute('hidden');
-    menu.removeAttribute('aria-hidden');
+    if (hideTimeoutId !== null) {
+      window.clearTimeout(hideTimeoutId);
+      hideTimeoutId = null;
+    }
+    menu.hidden = false;
+    menu.setAttribute('aria-hidden', 'false');
 
-    requestAnimationFrame(() => {
-      document.body.classList.add('menu-open');
-      setExpandedState(true);
-      focusInitialElement();
-    });
+    document.body.classList.add('menu-open');
+    menu.classList.add('is-open');
+    setExpandedState(true);
+    focusInitialElement();
 
     document.addEventListener('keydown', handleKeydown);
   }
@@ -180,16 +185,31 @@
     if (!document.body.classList.contains('menu-open')) return;
 
     document.body.classList.remove('menu-open');
+    menu.classList.remove('is-open');
+    menu.setAttribute('aria-hidden', 'true');
     setExpandedState(false);
     document.removeEventListener('keydown', handleKeydown);
 
-    const handleTransitionEnd = (event) => {
-      if (event.target !== menu || document.body.classList.contains('menu-open')) return;
-      menu.setAttribute('hidden', '');
-      menu.setAttribute('aria-hidden', 'true');
+    const hideMenu = (event) => {
+      if (event && event.target !== menu) return;
+      menu.removeEventListener('transitionend', hideMenu);
+      if (hideTimeoutId !== null) {
+        window.clearTimeout(hideTimeoutId);
+        hideTimeoutId = null;
+      }
+      if (menu.classList.contains('is-open')) return;
+      menu.hidden = true;
     };
 
-    menu.addEventListener('transitionend', handleTransitionEnd, { once: true });
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      hideMenu();
+    } else {
+      menu.addEventListener('transitionend', hideMenu);
+      hideTimeoutId = window.setTimeout(() => {
+        hideMenu();
+        hideTimeoutId = null;
+      }, 320);
+    }
 
     const focusTarget = focusToggle
       ? toggle

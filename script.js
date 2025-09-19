@@ -94,7 +94,6 @@
   const closeTargets = menu.querySelectorAll('[data-menu-close]');
   const menuLinks = menu.querySelectorAll('[data-menu-link]');
   const initialFocus = menu.querySelector('[data-menu-focus]');
-  const toggleLabel = toggle.querySelector('.site-menu-toggle__label');
 
   const FOCUSABLE_SELECTORS = [
     'a[href]',
@@ -121,9 +120,7 @@
 
   function setExpandedState(isExpanded) {
     toggle.setAttribute('aria-expanded', String(isExpanded));
-    if (toggleLabel) {
-      toggleLabel.textContent = isExpanded ? 'Close' : 'Menu';
-    }
+    toggle.setAttribute('aria-label', isExpanded ? 'Close menu' : 'Open menu');
   }
 
   function trapFocus(event) {

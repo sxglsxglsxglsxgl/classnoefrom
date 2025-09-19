@@ -17,18 +17,17 @@
   <header class="site-header">
     <div class="site-header__inner">
       <div class="site-lockup">
-        <div class="site-brand" aria-label="CLASSNOE MESTO">CLASSNOE MESTO</div>
+        <span class="site-brand">CLASSNOE MESTO</span>
       </div>
       <button
-        class="menu-toggle"
+        class="site-menu-toggle"
         type="button"
         data-menu-toggle
         aria-expanded="false"
         aria-controls="site-menu"
       >
-        <span class="menu-toggle__label">Menu</span>
-        <span class="menu-toggle__icon" aria-hidden="true">
-          <span></span>
+        <span class="site-menu-toggle__label">Menu</span>
+        <span class="site-menu-toggle__icon" aria-hidden="true">
           <span></span>
           <span></span>
         </span>
@@ -47,9 +46,12 @@
   >
     <div class="site-menu__backdrop" data-menu-close></div>
     <div class="site-menu__container" role="document" tabindex="-1">
-      <button class="site-menu__close" type="button" data-menu-close aria-label="Close menu">
-        <span aria-hidden="true">Close</span>
-      </button>
+      <div class="site-menu__header">
+        <p class="site-menu__title">Menu</p>
+        <button class="site-menu__close" type="button" data-menu-close aria-label="Close menu">
+          <span aria-hidden="true">Close</span>
+        </button>
+      </div>
       <nav class="site-menu__nav" aria-label="Primary">
         <ul class="site-menu__list" role="list">
           <li class="site-menu__item">

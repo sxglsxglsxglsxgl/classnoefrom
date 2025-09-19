@@ -204,6 +204,11 @@
     menu.hidden = false;
     menu.removeAttribute('hidden');
     menu.setAttribute('aria-hidden', 'false');
+
+    // Ensure the opening opacity transition runs after the element becomes visible.
+    menu.classList.remove('is-open');
+    void menu.offsetWidth;
+
     menu.classList.add('is-open');
     document.body.classList.add('has-menu-open');
 

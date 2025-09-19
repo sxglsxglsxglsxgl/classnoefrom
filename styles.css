@@ -252,7 +252,8 @@ main::after {
   transition: opacity 360ms ease-in-out, transform 360ms ease-in-out;
 }
 
-body.has-menu-open .site-lockup {
+body.has-menu-open .site-lockup,
+body.is-menu-closing .site-lockup {
   opacity: 0;
   transform: translateY(-8px);
   pointer-events: none;
@@ -292,7 +293,8 @@ body.has-menu-open .site-lockup {
   outline: none;
 }
 
-body.has-menu-open .site-menu-toggle {
+body.has-menu-open .site-menu-toggle,
+body.is-menu-closing .site-menu-toggle {
   color: rgba(255, 255, 255, 0.995);
 }
 
@@ -330,17 +332,20 @@ body.has-menu-open .site-menu-toggle {
   bottom: 0;
 }
 
-body.has-menu-open .site-menu-toggle__icon span:nth-child(1) {
+body.has-menu-open .site-menu-toggle__icon span:nth-child(1),
+body.is-menu-closing .site-menu-toggle__icon span:nth-child(1) {
   top: 50%;
   transform: translateY(-50%) rotate(45deg);
 }
 
-body.has-menu-open .site-menu-toggle__icon span:nth-child(2) {
+body.has-menu-open .site-menu-toggle__icon span:nth-child(2),
+body.is-menu-closing .site-menu-toggle__icon span:nth-child(2) {
   opacity: 0;
   transform: translateY(-50%) scaleX(0.4);
 }
 
-body.has-menu-open .site-menu-toggle__icon span:nth-child(3) {
+body.has-menu-open .site-menu-toggle__icon span:nth-child(3),
+body.is-menu-closing .site-menu-toggle__icon span:nth-child(3) {
   bottom: auto;
   top: 50%;
   transform: translateY(-50%) rotate(-45deg);

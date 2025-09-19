@@ -145,16 +145,24 @@ footer,
   transition: filter 500ms ease-in-out, opacity 500ms ease-in-out;
 }
 
-body.has-menu-open header,
 body.has-menu-open main,
 body.has-menu-open footer,
 body.has-menu-open .backdrop,
-body.is-menu-closing header,
 body.is-menu-closing main,
 body.is-menu-closing footer,
 body.is-menu-closing .backdrop {
   filter: blur(28px);
   opacity: 0.2;
+}
+
+body.has-menu-open .site-header,
+body.is-menu-closing .site-header {
+  pointer-events: none;
+}
+
+body.has-menu-open .site-menu-toggle,
+body.is-menu-closing .site-menu-toggle {
+  pointer-events: auto;
 }
 
 .site-menu {

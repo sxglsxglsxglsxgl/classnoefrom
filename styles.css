@@ -285,7 +285,6 @@ main::after {
   width: min(1200px, 100%);
   transform: translateX(-50%);
   padding: 0 clamp(20px, 6vw, 60px);
-  pointer-events: none;
 }
 
 .site-header__inner {

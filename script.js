@@ -127,6 +127,16 @@
     if (event.key !== 'Tab') return;
 
     const focusable = getFocusableElements();
+    if (
+      document.body.classList.contains('has-menu-open') &&
+      toggle instanceof HTMLElement &&
+      !toggle.hasAttribute('disabled')
+    ) {
+      const rect = toggle.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        focusable.push(toggle);
+      }
+    }
     if (focusable.length === 0) {
       event.preventDefault();
       return;

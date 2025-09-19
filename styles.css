@@ -307,7 +307,7 @@ body.is-menu-closing .site-lockup {
   appearance: none;
   cursor: pointer;
   font-family: var(--font-brand);
-  font-size: clamp(24px, 6vw, 64px);
+  font-size: clamp(21.6px, 5.4vw, 57.6px);
   font-weight: 700;
   letter-spacing: 0.06em;
   line-height: 1.05;

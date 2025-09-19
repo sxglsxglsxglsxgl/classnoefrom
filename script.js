@@ -45,13 +45,15 @@
 
   function updateActiveSentence() {
     const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+    const revealOffset = viewportHeight * 0.3;
     const viewportCenter = viewportHeight / 2;
     let nextIndex = -1;
     let smallestDistance = Infinity;
 
     nodes.forEach((node, index) => {
       const rect = node.getBoundingClientRect();
-      const isIntersecting = rect.bottom > 0 && rect.top < viewportHeight;
+      const isIntersecting =
+        rect.bottom > -revealOffset && rect.top < viewportHeight + revealOffset;
 
       if (!isIntersecting) {
         return;

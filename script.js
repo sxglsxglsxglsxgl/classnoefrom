@@ -10,9 +10,32 @@
     return;
   }
 
+  let pendingFrame = null;
+
+  const scheduleRetry = () => {
+    if (pendingFrame != null) {
+      return;
+    }
+
+    pendingFrame = requestAnimationFrame(() => {
+      pendingFrame = null;
+      updateViewportUnit();
+    });
+  };
+
   const updateViewportUnit = () => {
     const height = window.visualViewport?.height ?? window.innerHeight;
-    if (!Number.isFinite(height)) return;
+
+    if (typeof height !== 'number' || !Number.isFinite(height) || height <= 0) {
+      scheduleRetry();
+      return;
+    }
+
+    if (pendingFrame != null) {
+      cancelAnimationFrame(pendingFrame);
+      pendingFrame = null;
+    }
+
     root.style.setProperty('--viewport-unit', `${height / 100}px`);
   };
 
@@ -47,6 +70,11 @@
     updateViewportUnit();
 
     window.__viewportUnitCleanup = () => {
+      if (pendingFrame != null) {
+        cancelAnimationFrame(pendingFrame);
+        pendingFrame = null;
+      }
+
       while (bindings.length) {
         const remove = bindings.pop();
         remove();

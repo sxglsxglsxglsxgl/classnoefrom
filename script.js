@@ -126,12 +126,39 @@
     });
   };
 
-  const applyViewportEffectsHeight = (value) => {
-    if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) {
+  const toViewportUnit = (value) => `${value / 100}px`;
+
+  const resolveLockedEffectsHeight = (value) => {
+    const lockedHeight =
+      typeof lockedViewportHeight === 'number' &&
+      Number.isFinite(lockedViewportHeight) &&
+      lockedViewportHeight > 0
+        ? lockedViewportHeight
+        : null;
+
+    if (lockedHeight == null) {
+      return value;
+    }
+
+    if (typeof value === 'number' && Number.isFinite(value) && value > 0) {
+      return Math.max(lockedHeight, value);
+    }
+
+    return lockedHeight;
+  };
+
+  const applyViewportEffectsHeight = (value, { resolved = false } = {}) => {
+    const effectsHeight = resolved ? value : resolveLockedEffectsHeight(value);
+
+    if (
+      typeof effectsHeight !== 'number' ||
+      !Number.isFinite(effectsHeight) ||
+      effectsHeight <= 0
+    ) {
       return;
     }
 
-    const nextValue = `${value / 100}px`;
+    const nextValue = toViewportUnit(effectsHeight);
     if (root.style.getPropertyValue('--viewport-effects-unit') !== nextValue) {
       root.style.setProperty('--viewport-effects-unit', nextValue);
     }
@@ -142,11 +169,12 @@
     if (lock) {
       lockedViewportHeight = value;
     }
-    const nextValue = `${value / 100}px`;
+    const nextValue = toViewportUnit(value);
     if (root.style.getPropertyValue('--viewport-unit') !== nextValue) {
       root.style.setProperty('--viewport-unit', nextValue);
     }
-    applyViewportEffectsHeight(value);
+    const effectsHeight = resolveLockedEffectsHeight(value);
+    applyViewportEffectsHeight(effectsHeight, { resolved: true });
     broadcastViewportHeight(value);
   };
 

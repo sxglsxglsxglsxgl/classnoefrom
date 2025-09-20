@@ -59,14 +59,34 @@
   };
 
   const WIDTH_EPSILON = 1;
-  const HEIGHT_INCREASE_THRESHOLD = 120;
-  const HEIGHT_DECREASE_THRESHOLD = 12;
+  const DEFAULT_HEIGHT_INCREASE_THRESHOLD = 120;
+  const DEFAULT_HEIGHT_DECREASE_THRESHOLD = 12;
+  const COARSE_HEIGHT_CHANGE_THRESHOLD = 160;
+  const KEYBOARD_VIEWPORT_RATIO = 0.78;
   // Allow fast updates when the viewport shrinks (e.g., browser chrome expands)
-  // while ignoring modest growth to avoid layout jumps when the chrome hides.
+  // while ignoring modest growth to avoid layout jumps when the chrome hides. Coarse
+  // pointer environments get an additional buffer so dynamic browser chrome toggles
+  // do not immediately retrigger layout work.
   const HEIGHT_UPDATE_DELAY_MS = 50;
 
   const orientationMediaQuery =
     typeof window.matchMedia === 'function' ? window.matchMedia('(orientation: portrait)') : null;
+
+  const coarsePointerMediaQuery =
+    typeof window.matchMedia === 'function'
+      ? window.matchMedia('(hover: none) and (pointer: coarse)')
+      : null;
+
+  let hasCoarsePointer = coarsePointerMediaQuery?.matches ?? false;
+
+  const refreshPointerMatch = () => {
+    if (!coarsePointerMediaQuery) {
+      hasCoarsePointer = false;
+      return;
+    }
+
+    hasCoarsePointer = Boolean(coarsePointerMediaQuery.matches);
+  };
 
   const getOrientation = () => {
     const screenOrientation = window.screen?.orientation?.type;
@@ -166,6 +186,28 @@
     const normalizedLastHeight =
       typeof lastViewportHeight === 'number' ? Math.round(lastViewportHeight) : null;
 
+    const screenHeight = pickDimension([window.screen?.height, window.screen?.availHeight]);
+    const normalizedScreenHeight =
+      typeof screenHeight === 'number' ? Math.round(screenHeight) : null;
+
+    const isLikelyKeyboardViewport =
+      hasCoarsePointer &&
+      normalizedScreenHeight != null &&
+      normalizedHeight / normalizedScreenHeight <= KEYBOARD_VIEWPORT_RATIO;
+
+    const wasLikelyKeyboardViewport =
+      hasCoarsePointer &&
+      normalizedScreenHeight != null &&
+      normalizedLastHeight != null &&
+      normalizedLastHeight / normalizedScreenHeight <= KEYBOARD_VIEWPORT_RATIO;
+
+    const heightDecreaseThreshold = hasCoarsePointer
+      ? COARSE_HEIGHT_CHANGE_THRESHOLD
+      : DEFAULT_HEIGHT_DECREASE_THRESHOLD;
+    const heightIncreaseThreshold = hasCoarsePointer
+      ? COARSE_HEIGHT_CHANGE_THRESHOLD
+      : DEFAULT_HEIGHT_INCREASE_THRESHOLD;
+
     const widthChanged =
       typeof width === 'number' &&
       typeof lastViewportWidth === 'number' &&
@@ -176,11 +218,13 @@
 
     const heightDecreased =
       normalizedLastHeight != null &&
-      normalizedHeight <= normalizedLastHeight - HEIGHT_DECREASE_THRESHOLD;
+      (normalizedHeight <= normalizedLastHeight - heightDecreaseThreshold ||
+        (isLikelyKeyboardViewport && !wasLikelyKeyboardViewport));
 
     const heightIncreased =
       normalizedLastHeight != null &&
-      normalizedHeight >= normalizedLastHeight + HEIGHT_INCREASE_THRESHOLD;
+      (normalizedHeight >= normalizedLastHeight + heightIncreaseThreshold ||
+        (!isLikelyKeyboardViewport && wasLikelyKeyboardViewport));
 
     const widthWasUnknown = typeof width === 'number' && lastViewportWidth == null;
     const widthBecameUnknown = width == null && typeof lastViewportWidth === 'number';
@@ -240,7 +284,27 @@
 
     window.removeEventListener('pagehide', handlePageHide);
 
+    refreshPointerMatch();
+
     const bindings = [];
+
+    if (coarsePointerMediaQuery) {
+      const handlePointerChange = () => {
+        refreshPointerMatch();
+      };
+
+      if (typeof coarsePointerMediaQuery.addEventListener === 'function') {
+        coarsePointerMediaQuery.addEventListener('change', handlePointerChange);
+        bindings.push(() => {
+          coarsePointerMediaQuery.removeEventListener('change', handlePointerChange);
+        });
+      } else if (typeof coarsePointerMediaQuery.addListener === 'function') {
+        coarsePointerMediaQuery.addListener(handlePointerChange);
+        bindings.push(() => {
+          coarsePointerMediaQuery.removeListener(handlePointerChange);
+        });
+      }
+    }
 
     lastViewportWidth = null;
     lastViewportHeight = null;

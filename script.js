@@ -16,45 +16,62 @@
     root.style.setProperty('--viewport-unit', `${height / 100}px`);
   };
 
-  const bindings = [];
-
-  const addListener = (target, type) => {
-    target.addEventListener(type, updateViewportUnit);
-    bindings.push({ target, type, listener: updateViewportUnit });
-  };
-
-  addListener(window, 'resize');
-  addListener(window, 'orientationchange');
-
-  if (window.visualViewport) {
-    addListener(window.visualViewport, 'resize');
+  function handlePageHide() {
+    window.__viewportUnitCleanup?.();
+    window.__viewportUnitCleanup = null;
   }
 
-  updateViewportUnit();
+  function initialize() {
+    if (typeof window.__viewportUnitCleanup === 'function') {
+      window.__viewportUnitCleanup();
+    }
 
-  function cleanup() {
-    bindings.forEach(({ target, type, listener }) => {
-      target.removeEventListener(type, listener);
-    });
+    window.removeEventListener('pagehide', handlePageHide);
+
+    const bindings = [];
+
+    const addListener = (target, type) => {
+      target.addEventListener(type, updateViewportUnit);
+      bindings.push(() => {
+        target.removeEventListener(type, updateViewportUnit);
+      });
+    };
+
+    addListener(window, 'resize');
+    addListener(window, 'orientationchange');
+
+    if (window.visualViewport) {
+      addListener(window.visualViewport, 'resize');
+    }
+
+    updateViewportUnit();
+
+    window.__viewportUnitCleanup = () => {
+      while (bindings.length) {
+        const remove = bindings.pop();
+        remove();
+      }
+      window.removeEventListener('pagehide', handlePageHide);
+      root.style.removeProperty('--viewport-unit');
+    };
+
+    window.addEventListener('pagehide', handlePageHide, { once: true });
   }
 
-  if (typeof window.__viewportUnitCleanup === 'function') {
-    window.__viewportUnitCleanup();
+  function handlePageShow(event) {
+    if (!event.persisted) {
+      return;
+    }
+
+    if (typeof window.__viewportUnitCleanup === 'function') {
+      return;
+    }
+
+    initialize();
   }
 
-  window.__viewportUnitCleanup = () => {
-    cleanup();
-    root.style.removeProperty('--viewport-unit');
-  };
-
-  window.addEventListener(
-    'pagehide',
-    () => {
-      window.__viewportUnitCleanup?.();
-      window.__viewportUnitCleanup = null;
-    },
-    { once: true }
-  );
+  initialize();
+  window.addEventListener('pageshow', handlePageShow);
 })();
 
 (function () {

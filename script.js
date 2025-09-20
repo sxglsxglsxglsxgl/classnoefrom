@@ -1,4 +1,63 @@
 (function () {
+  const root = document.documentElement;
+  if (!root) return;
+
+  const hasCSSSupports = typeof CSS !== 'undefined' && typeof CSS.supports === 'function';
+  const supportsDynamicViewport =
+    hasCSSSupports && (CSS.supports('height: 100dvh') || CSS.supports('height: 100svh'));
+
+  if (supportsDynamicViewport) {
+    return;
+  }
+
+  const updateViewportUnit = () => {
+    const height = window.visualViewport?.height ?? window.innerHeight;
+    if (!Number.isFinite(height)) return;
+    root.style.setProperty('--viewport-unit', `${height / 100}px`);
+  };
+
+  const bindings = [];
+
+  const addListener = (target, type) => {
+    target.addEventListener(type, updateViewportUnit);
+    bindings.push({ target, type, listener: updateViewportUnit });
+  };
+
+  addListener(window, 'resize');
+  addListener(window, 'orientationchange');
+
+  if (window.visualViewport) {
+    addListener(window.visualViewport, 'resize');
+  }
+
+  updateViewportUnit();
+
+  function cleanup() {
+    bindings.forEach(({ target, type, listener }) => {
+      target.removeEventListener(type, listener);
+    });
+  }
+
+  if (typeof window.__viewportUnitCleanup === 'function') {
+    window.__viewportUnitCleanup();
+  }
+
+  window.__viewportUnitCleanup = () => {
+    cleanup();
+    root.style.removeProperty('--viewport-unit');
+  };
+
+  window.addEventListener(
+    'pagehide',
+    () => {
+      window.__viewportUnitCleanup?.();
+      window.__viewportUnitCleanup = null;
+    },
+    { once: true }
+  );
+})();
+
+(function () {
   const { SENTENCES } = window.SITE_CONFIG || {};
   if (!Array.isArray(SENTENCES) || SENTENCES.length === 0) return;
 

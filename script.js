@@ -17,6 +17,47 @@
   let pendingHeight = null;
   let pendingTimeoutId = null;
 
+  const VIEWPORT_HEIGHT_EVENT = 'viewportheightchange';
+  const VIEWPORT_HEIGHT_STATE_KEY = '__viewportHeightPx';
+  let lastBroadcastViewportHeight = null;
+
+  const storeViewportHeight = (value) => {
+    if (
+      typeof window !== 'object' ||
+      typeof value !== 'number' ||
+      !Number.isFinite(value) ||
+      value <= 0
+    ) {
+      return;
+    }
+    window[VIEWPORT_HEIGHT_STATE_KEY] = value;
+  };
+
+  const broadcastViewportHeight = (value) => {
+    storeViewportHeight(value);
+    if (lastBroadcastViewportHeight === value) {
+      return;
+    }
+    lastBroadcastViewportHeight = value;
+    if (typeof window !== 'object' || typeof window.dispatchEvent !== 'function') {
+      return;
+    }
+
+    const detail = { height: value };
+    let event = null;
+
+    if (typeof window.CustomEvent === 'function') {
+      event = new CustomEvent(VIEWPORT_HEIGHT_EVENT, { detail });
+    } else if (typeof document !== 'undefined' && typeof document.createEvent === 'function') {
+      event = document.createEvent('CustomEvent');
+      event.initCustomEvent(VIEWPORT_HEIGHT_EVENT, false, false, detail);
+    }
+
+    if (event) {
+      window.dispatchEvent(event);
+    }
+  };
+
   const WIDTH_EPSILON = 1;
   const HEIGHT_INCREASE_THRESHOLD = 120;
   const HEIGHT_DECREASE_THRESHOLD = 12;
@@ -65,6 +106,7 @@
     if (root.style.getPropertyValue('--viewport-unit') !== nextValue) {
       root.style.setProperty('--viewport-unit', nextValue);
     }
+    broadcastViewportHeight(value);
   };
 
   const commitPendingHeightUpdate = () => {
@@ -262,6 +304,9 @@
   const container = document.getElementById('sentences');
   if (!container) return;
 
+  const VIEWPORT_HEIGHT_EVENT = 'viewportheightchange';
+  const VIEWPORT_HEIGHT_STATE_KEY = '__viewportHeightPx';
+
   const total = SENTENCES.length;
   const nodes = SENTENCES.map((text, index) => {
     const sentence = document.createElement('p');
@@ -277,6 +322,29 @@
   const revealed = new Set();
   let activeIndex = -1;
   let ticking = false;
+
+  const getStableViewportHeight = () => {
+    const sharedHeight = window[VIEWPORT_HEIGHT_STATE_KEY];
+    if (
+      typeof sharedHeight === 'number' &&
+      Number.isFinite(sharedHeight) &&
+      sharedHeight > 0
+    ) {
+      return sharedHeight;
+    }
+
+    const innerHeight = typeof window.innerHeight === 'number' ? window.innerHeight : null;
+    if (innerHeight != null && innerHeight > 0) {
+      return innerHeight;
+    }
+
+    const clientHeight = document.documentElement?.clientHeight;
+    if (typeof clientHeight === 'number' && clientHeight > 0) {
+      return clientHeight;
+    }
+
+    return 0;
+  };
 
   applyStates(activeIndex);
 
@@ -301,7 +369,7 @@
   }
 
   function updateActiveSentence() {
-    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+    const viewportHeight = getStableViewportHeight();
     const revealOffset = viewportHeight * 0.3;
     const viewportCenter = viewportHeight / 2;
     let nextIndex = -1;
@@ -345,6 +413,7 @@
 
   window.addEventListener('scroll', requestUpdate, { passive: true });
   window.addEventListener('resize', requestUpdate);
+  window.addEventListener(VIEWPORT_HEIGHT_EVENT, requestUpdate);
 })();
 
 (function () {

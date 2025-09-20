@@ -58,10 +58,15 @@
     }
   };
 
-  const WIDTH_EPSILON = 1;
+  const FINE_POINTER_WIDTH_THRESHOLD = 1;
   const DEFAULT_HEIGHT_INCREASE_THRESHOLD = 120;
   const DEFAULT_HEIGHT_DECREASE_THRESHOLD = 12;
   const COARSE_HEIGHT_CHANGE_THRESHOLD = 160;
+  // On coarse pointer devices, dynamic browser chrome animations can nudge the
+  // reported visual viewport width by a few pixels even though the layout width
+  // remains effectively unchanged. Bumping the threshold avoids treating those
+  // jitters as real resizes that would bypass the height buffering.
+  const COARSE_WIDTH_CHANGE_THRESHOLD = 8;
   const KEYBOARD_VIEWPORT_RATIO = 0.78;
   // Allow fast updates when the viewport shrinks (e.g., browser chrome expands)
   // while ignoring modest growth to avoid layout jumps when the chrome hides. Coarse
@@ -180,6 +185,11 @@
       document.documentElement?.clientWidth,
     ]);
 
+    const normalizedWidth =
+      typeof width === 'number' ? Math.round(width) : null;
+    const normalizedLastWidth =
+      typeof lastViewportWidth === 'number' ? Math.round(lastViewportWidth) : null;
+
     const orientation = getOrientation();
 
     const normalizedHeight = Math.round(height);
@@ -208,10 +218,13 @@
       ? COARSE_HEIGHT_CHANGE_THRESHOLD
       : DEFAULT_HEIGHT_INCREASE_THRESHOLD;
 
+    const widthThreshold = hasCoarsePointer
+      ? COARSE_WIDTH_CHANGE_THRESHOLD
+      : FINE_POINTER_WIDTH_THRESHOLD;
     const widthChanged =
-      typeof width === 'number' &&
-      typeof lastViewportWidth === 'number' &&
-      Math.abs(width - lastViewportWidth) > WIDTH_EPSILON;
+      normalizedWidth != null &&
+      normalizedLastWidth != null &&
+      Math.abs(normalizedWidth - normalizedLastWidth) > widthThreshold;
 
     const orientationChanged =
       orientation != null && lastOrientation != null && orientation !== lastOrientation;

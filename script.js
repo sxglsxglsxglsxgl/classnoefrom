@@ -11,6 +11,36 @@
   }
 
   let pendingFrame = null;
+  let lastViewportWidth = null;
+  let lastViewportHeight = null;
+  let lastOrientation = null;
+
+  const WIDTH_EPSILON = 1;
+  const HEIGHT_CHANGE_THRESHOLD = 120;
+
+  const orientationMediaQuery =
+    typeof window.matchMedia === 'function' ? window.matchMedia('(orientation: portrait)') : null;
+
+  const getOrientation = () => {
+    const screenOrientation = window.screen?.orientation?.type;
+    if (typeof screenOrientation === 'string') {
+      return screenOrientation.startsWith('landscape') ? 'landscape' : 'portrait';
+    }
+
+    if (typeof window.orientation === 'number') {
+      return Math.abs(window.orientation) === 90 ? 'landscape' : 'portrait';
+    }
+
+    if (orientationMediaQuery) {
+      return orientationMediaQuery.matches ? 'portrait' : 'landscape';
+    }
+
+    return null;
+  };
+
+  const pickDimension = (candidates) =>
+    candidates.find((value) => typeof value === 'number' && Number.isFinite(value) && value > 0) ??
+    null;
 
   const scheduleRetry = () => {
     if (pendingFrame != null) {
@@ -24,9 +54,13 @@
   };
 
   const updateViewportUnit = () => {
-    const height = window.visualViewport?.height ?? window.innerHeight;
+    const height = pickDimension([
+      window.visualViewport?.height,
+      window.innerHeight,
+      document.documentElement?.clientHeight,
+    ]);
 
-    if (typeof height !== 'number' || !Number.isFinite(height) || height <= 0) {
+    if (height == null) {
       scheduleRetry();
       return;
     }
@@ -36,7 +70,56 @@
       pendingFrame = null;
     }
 
-    root.style.setProperty('--viewport-unit', `${height / 100}px`);
+    const width = pickDimension([
+      window.visualViewport?.width,
+      window.innerWidth,
+      document.documentElement?.clientWidth,
+    ]);
+
+    const orientation = getOrientation();
+
+    const widthChanged =
+      typeof width === 'number' &&
+      typeof lastViewportWidth === 'number' &&
+      Math.abs(width - lastViewportWidth) > WIDTH_EPSILON;
+
+    const orientationChanged =
+      orientation != null && lastOrientation != null && orientation !== lastOrientation;
+
+    const significantHeightChange =
+      lastViewportHeight != null &&
+      Math.abs(height - lastViewportHeight) > HEIGHT_CHANGE_THRESHOLD;
+
+    const widthWasUnknown = typeof width === 'number' && lastViewportWidth == null;
+    const widthBecameUnknown = width == null && typeof lastViewportWidth === 'number';
+
+    const shouldUpdate =
+      lastViewportHeight == null ||
+      widthChanged ||
+      orientationChanged ||
+      significantHeightChange ||
+      widthWasUnknown ||
+      widthBecameUnknown;
+
+    if (!shouldUpdate) {
+      lastViewportWidth = typeof width === 'number' ? width : lastViewportWidth;
+      if (orientation != null) {
+        lastOrientation = orientation;
+      }
+      return;
+    }
+
+    lastViewportWidth = typeof width === 'number' ? width : null;
+    if (orientation != null) {
+      lastOrientation = orientation;
+    }
+
+    lastViewportHeight = height;
+
+    const nextValue = `${height / 100}px`;
+    if (root.style.getPropertyValue('--viewport-unit') !== nextValue) {
+      root.style.setProperty('--viewport-unit', nextValue);
+    }
   };
 
   function handlePageHide() {
@@ -52,6 +135,10 @@
     window.removeEventListener('pagehide', handlePageHide);
 
     const bindings = [];
+
+    lastViewportWidth = null;
+    lastViewportHeight = null;
+    lastOrientation = null;
 
     const addListener = (target, type) => {
       target.addEventListener(type, updateViewportUnit);

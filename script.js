@@ -24,9 +24,17 @@
   };
 
   const updateViewportUnit = () => {
-    const height = window.visualViewport?.height ?? window.innerHeight;
+    const candidates = [
+      window.visualViewport?.height,
+      window.innerHeight,
+      document.documentElement?.clientHeight,
+    ];
 
-    if (typeof height !== 'number' || !Number.isFinite(height) || height <= 0) {
+    const height = candidates.find(
+      (value) => typeof value === 'number' && Number.isFinite(value) && value > 0,
+    );
+
+    if (typeof height !== 'number') {
       scheduleRetry();
       return;
     }

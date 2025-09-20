@@ -16,7 +16,10 @@
   let lastOrientation = null;
 
   const WIDTH_EPSILON = 1;
-  const HEIGHT_CHANGE_THRESHOLD = 120;
+  const HEIGHT_INCREASE_THRESHOLD = 120;
+  const HEIGHT_DECREASE_THRESHOLD = 12;
+  // Allow fast updates when the viewport shrinks (e.g., browser chrome expands)
+  // while ignoring modest growth to avoid layout jumps when the chrome hides.
 
   const orientationMediaQuery =
     typeof window.matchMedia === 'function' ? window.matchMedia('(orientation: portrait)') : null;
@@ -78,6 +81,10 @@
 
     const orientation = getOrientation();
 
+    const normalizedHeight = Math.round(height);
+    const normalizedLastHeight =
+      typeof lastViewportHeight === 'number' ? Math.round(lastViewportHeight) : null;
+
     const widthChanged =
       typeof width === 'number' &&
       typeof lastViewportWidth === 'number' &&
@@ -86,9 +93,13 @@
     const orientationChanged =
       orientation != null && lastOrientation != null && orientation !== lastOrientation;
 
-    const significantHeightChange =
-      lastViewportHeight != null &&
-      Math.abs(height - lastViewportHeight) > HEIGHT_CHANGE_THRESHOLD;
+    const heightDecreased =
+      normalizedLastHeight != null &&
+      normalizedHeight <= normalizedLastHeight - HEIGHT_DECREASE_THRESHOLD;
+
+    const heightIncreased =
+      normalizedLastHeight != null &&
+      normalizedHeight >= normalizedLastHeight + HEIGHT_INCREASE_THRESHOLD;
 
     const widthWasUnknown = typeof width === 'number' && lastViewportWidth == null;
     const widthBecameUnknown = width == null && typeof lastViewportWidth === 'number';
@@ -97,7 +108,8 @@
       lastViewportHeight == null ||
       widthChanged ||
       orientationChanged ||
-      significantHeightChange ||
+      heightDecreased ||
+      heightIncreased ||
       widthWasUnknown ||
       widthBecameUnknown;
 

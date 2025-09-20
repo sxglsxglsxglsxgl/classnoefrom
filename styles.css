@@ -6,7 +6,9 @@
   --text-subtle: rgba(255, 255, 255, 0.6);
   --text-faint: rgba(255, 255, 255, 0.26);
   --viewport-unit: 1vh;
+  --viewport-effects-unit: 1vh;
   --overscroll-bleed: clamp(120px, calc(var(--viewport-unit) * 16), 240px);
+  --overscroll-effects-bleed: clamp(120px, calc(var(--viewport-effects-unit) * 16), 240px);
   --font-brand: 'Outfit', 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont,
     'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
   --font-serif: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
@@ -19,9 +21,16 @@
   }
 }
 
+@supports (height: 100dvh) {
+  :root {
+    --viewport-effects-unit: 1dvh;
+  }
+}
+
 @supports (height: 100dvh) and not (height: 100svh) {
   :root {
     --viewport-unit: 1dvh;
+    --viewport-effects-unit: 1dvh;
   }
 }
 
@@ -77,7 +86,7 @@ body.is-menu-closing {
 body::before {
   content: '';
   position: fixed;
-  inset: calc(var(--overscroll-bleed) * -1);
+  inset: calc(var(--overscroll-effects-bleed) * -1);
   background: radial-gradient(120% 70% at 50% 0%, rgba(255, 244, 230, 0.1), rgba(5, 5, 5, 0)),
     radial-gradient(80% 60% at 80% 25%, rgba(248, 230, 210, 0.08), rgba(5, 5, 5, 0)),
     radial-gradient(120% 60% at 20% 80%, rgba(245, 220, 200, 0.08), rgba(5, 5, 5, 0));
@@ -89,7 +98,7 @@ body::before {
 body::after {
   content: '';
   position: fixed;
-  inset: calc(var(--overscroll-bleed) * -1) 0;
+  inset: calc(var(--overscroll-effects-bleed) * -1) 0;
   pointer-events: none;
   z-index: 2;
   background-image:
@@ -103,19 +112,19 @@ body::after {
       rgba(5, 5, 5, 0) 100%
     );
   background-position:
-    center var(--overscroll-bleed),
-    center calc(100% - var(--overscroll-bleed)),
-    center calc(100% - var(--overscroll-bleed));
+    center var(--overscroll-effects-bleed),
+    center calc(100% - var(--overscroll-effects-bleed)),
+    center calc(100% - var(--overscroll-effects-bleed));
   background-repeat: no-repeat;
   background-size:
-    100% clamp(160px, calc(var(--viewport-unit) * 34), 360px),
-    100% clamp(160px, calc(var(--viewport-unit) * 34), 360px),
-    100% clamp(200px, calc(var(--viewport-unit) * 42), 420px);
+    100% clamp(160px, calc(var(--viewport-effects-unit) * 34), 360px),
+    100% clamp(160px, calc(var(--viewport-effects-unit) * 34), 360px),
+    100% clamp(200px, calc(var(--viewport-effects-unit) * 42), 420px);
 }
 
 .backdrop {
   position: fixed;
-  inset: calc(var(--overscroll-bleed) * -1) 0;
+  inset: calc(var(--overscroll-effects-bleed) * -1) 0;
   background: rgba(5, 5, 5, 0.82);
   pointer-events: none;
   z-index: 0;

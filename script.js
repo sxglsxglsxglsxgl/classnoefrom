@@ -14,12 +14,15 @@
   let lastViewportWidth = null;
   let lastViewportHeight = null;
   let lastOrientation = null;
+  let pendingHeight = null;
+  let pendingTimeoutId = null;
 
   const WIDTH_EPSILON = 1;
   const HEIGHT_INCREASE_THRESHOLD = 120;
   const HEIGHT_DECREASE_THRESHOLD = 12;
   // Allow fast updates when the viewport shrinks (e.g., browser chrome expands)
   // while ignoring modest growth to avoid layout jumps when the chrome hides.
+  const HEIGHT_UPDATE_DELAY_MS = 50;
 
   const orientationMediaQuery =
     typeof window.matchMedia === 'function' ? window.matchMedia('(orientation: portrait)') : null;
@@ -54,6 +57,42 @@
       pendingFrame = null;
       updateViewportUnit();
     });
+  };
+
+  const applyViewportHeight = (value) => {
+    lastViewportHeight = value;
+    const nextValue = `${value / 100}px`;
+    if (root.style.getPropertyValue('--viewport-unit') !== nextValue) {
+      root.style.setProperty('--viewport-unit', nextValue);
+    }
+  };
+
+  const commitPendingHeightUpdate = () => {
+    if (pendingHeight == null) {
+      return;
+    }
+    const heightToApply = pendingHeight;
+    pendingHeight = null;
+    applyViewportHeight(heightToApply);
+  };
+
+  const schedulePendingHeightUpdate = (height) => {
+    pendingHeight = height;
+    if (pendingTimeoutId != null) {
+      clearTimeout(pendingTimeoutId);
+    }
+    pendingTimeoutId = setTimeout(() => {
+      pendingTimeoutId = null;
+      commitPendingHeightUpdate();
+    }, HEIGHT_UPDATE_DELAY_MS);
+  };
+
+  const clearPendingHeightUpdate = () => {
+    if (pendingTimeoutId != null) {
+      clearTimeout(pendingTimeoutId);
+      pendingTimeoutId = null;
+    }
+    pendingHeight = null;
   };
 
   const updateViewportUnit = () => {
@@ -118,6 +157,9 @@
       if (orientation != null) {
         lastOrientation = orientation;
       }
+      if (pendingTimeoutId != null) {
+        schedulePendingHeightUpdate(height);
+      }
       return;
     }
 
@@ -126,12 +168,22 @@
       lastOrientation = orientation;
     }
 
-    lastViewportHeight = height;
+    const isHeightOnlyUpdate =
+      lastViewportHeight != null &&
+      (heightDecreased || heightIncreased) &&
+      !widthChanged &&
+      !orientationChanged &&
+      !widthWasUnknown &&
+      !widthBecameUnknown;
 
-    const nextValue = `${height / 100}px`;
-    if (root.style.getPropertyValue('--viewport-unit') !== nextValue) {
-      root.style.setProperty('--viewport-unit', nextValue);
+    if (isHeightOnlyUpdate) {
+      schedulePendingHeightUpdate(height);
+      return;
     }
+
+    clearPendingHeightUpdate();
+
+    applyViewportHeight(height);
   };
 
   function handlePageHide() {
@@ -173,6 +225,8 @@
         cancelAnimationFrame(pendingFrame);
         pendingFrame = null;
       }
+
+      clearPendingHeightUpdate();
 
       while (bindings.length) {
         const remove = bindings.pop();

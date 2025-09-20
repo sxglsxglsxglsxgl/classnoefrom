@@ -14,6 +14,7 @@
   let lastViewportWidth = null;
   let lastViewportHeight = null;
   let lastOrientation = null;
+  let lockedViewportHeight = null;
   let pendingHeight = null;
   let pendingTimeoutId = null;
 
@@ -125,8 +126,11 @@
     });
   };
 
-  const applyViewportHeight = (value) => {
+  const applyViewportHeight = (value, { lock = true } = {}) => {
     lastViewportHeight = value;
+    if (lock) {
+      lockedViewportHeight = value;
+    }
     const nextValue = `${value / 100}px`;
     if (root.style.getPropertyValue('--viewport-unit') !== nextValue) {
       root.style.setProperty('--viewport-unit', nextValue);
@@ -138,13 +142,13 @@
     if (pendingHeight == null) {
       return;
     }
-    const heightToApply = pendingHeight;
+    const { value, lock } = pendingHeight;
     pendingHeight = null;
-    applyViewportHeight(heightToApply);
+    applyViewportHeight(value, { lock });
   };
 
-  const schedulePendingHeightUpdate = (height) => {
-    pendingHeight = height;
+  const schedulePendingHeightUpdate = (height, lock) => {
+    pendingHeight = { value: height, lock };
     if (pendingTimeoutId != null) {
       clearTimeout(pendingTimeoutId);
     }
@@ -229,27 +233,51 @@
     const orientationChanged =
       orientation != null && lastOrientation != null && orientation !== lastOrientation;
 
+    const widthWasUnknown = typeof width === 'number' && lastViewportWidth == null;
+    const widthBecameUnknown = width == null && typeof lastViewportWidth === 'number';
+    const geometryChanged = widthChanged || orientationChanged || widthWasUnknown || widthBecameUnknown;
+
     const heightDecreased =
       normalizedLastHeight != null &&
       (normalizedHeight <= normalizedLastHeight - heightDecreaseThreshold ||
         (isLikelyKeyboardViewport && !wasLikelyKeyboardViewport));
 
-    const heightIncreased =
+    const generalHeightIncrease =
       normalizedLastHeight != null &&
-      (normalizedHeight >= normalizedLastHeight + heightIncreaseThreshold ||
-        (!isLikelyKeyboardViewport && wasLikelyKeyboardViewport));
+      normalizedHeight >= normalizedLastHeight + heightIncreaseThreshold;
 
-    const widthWasUnknown = typeof width === 'number' && lastViewportWidth == null;
-    const widthBecameUnknown = width == null && typeof lastViewportWidth === 'number';
+    const keyboardTransitionRestoringLayout =
+      normalizedLastHeight != null &&
+      !isLikelyKeyboardViewport &&
+      wasLikelyKeyboardViewport;
+
+    const visualViewportHeightRaw = window.visualViewport?.height;
+    const isVisualViewportMeasurement =
+      typeof visualViewportHeightRaw === 'number' &&
+      Number.isFinite(visualViewportHeightRaw) &&
+      Math.abs(visualViewportHeightRaw - height) < 0.5;
+
+    const normalizedLockedHeight =
+      typeof lockedViewportHeight === 'number' ? Math.round(lockedViewportHeight) : null;
+
+    const shouldIgnoreVisualViewportGrowth =
+      hasCoarsePointer &&
+      normalizedLockedHeight != null &&
+      generalHeightIncrease &&
+      !keyboardTransitionRestoringLayout &&
+      !geometryChanged &&
+      isVisualViewportMeasurement &&
+      normalizedHeight > normalizedLockedHeight;
+
+    const heightIncreaseRequiresUpdate =
+      keyboardTransitionRestoringLayout ||
+      (generalHeightIncrease && !shouldIgnoreVisualViewportGrowth);
 
     const shouldUpdate =
       lastViewportHeight == null ||
-      widthChanged ||
-      orientationChanged ||
+      geometryChanged ||
       heightDecreased ||
-      heightIncreased ||
-      widthWasUnknown ||
-      widthBecameUnknown;
+      heightIncreaseRequiresUpdate;
 
     if (!shouldUpdate) {
       lastViewportWidth = typeof width === 'number' ? width : lastViewportWidth;
@@ -257,7 +285,7 @@
         lastOrientation = orientation;
       }
       if (pendingTimeoutId != null) {
-        schedulePendingHeightUpdate(height);
+        schedulePendingHeightUpdate(height, !isLikelyKeyboardViewport);
       }
       return;
     }
@@ -267,22 +295,23 @@
       lastOrientation = orientation;
     }
 
+    if (geometryChanged) {
+      lockedViewportHeight = null;
+    }
+
     const isHeightOnlyUpdate =
       lastViewportHeight != null &&
-      (heightDecreased || heightIncreased) &&
-      !widthChanged &&
-      !orientationChanged &&
-      !widthWasUnknown &&
-      !widthBecameUnknown;
+      (heightDecreased || heightIncreaseRequiresUpdate) &&
+      !geometryChanged;
 
     if (isHeightOnlyUpdate) {
-      schedulePendingHeightUpdate(height);
+      schedulePendingHeightUpdate(height, !isLikelyKeyboardViewport);
       return;
     }
 
     clearPendingHeightUpdate();
 
-    applyViewportHeight(height);
+    applyViewportHeight(height, { lock: !isLikelyKeyboardViewport });
   };
 
   function handlePageHide() {
@@ -322,6 +351,7 @@
     lastViewportWidth = null;
     lastViewportHeight = null;
     lastOrientation = null;
+    lockedViewportHeight = null;
 
     const addListener = (target, type) => {
       target.addEventListener(type, updateViewportUnit);
@@ -352,6 +382,7 @@
         remove();
       }
       window.removeEventListener('pagehide', handlePageHide);
+      lockedViewportHeight = null;
       root.style.removeProperty('--viewport-unit');
     };
 

@@ -67,6 +67,26 @@
     }
   };
 
+  const commitPendingHeightUpdate = () => {
+    if (pendingHeight == null) {
+      return;
+    }
+    const heightToApply = pendingHeight;
+    pendingHeight = null;
+    applyViewportHeight(heightToApply);
+  };
+
+  const schedulePendingHeightUpdate = (height) => {
+    pendingHeight = height;
+    if (pendingTimeoutId != null) {
+      clearTimeout(pendingTimeoutId);
+    }
+    pendingTimeoutId = setTimeout(() => {
+      pendingTimeoutId = null;
+      commitPendingHeightUpdate();
+    }, HEIGHT_UPDATE_DELAY_MS);
+  };
+
   const clearPendingHeightUpdate = () => {
     if (pendingTimeoutId != null) {
       clearTimeout(pendingTimeoutId);
@@ -138,7 +158,7 @@
         lastOrientation = orientation;
       }
       if (pendingTimeoutId != null) {
-        pendingHeight = height;
+        schedulePendingHeightUpdate(height);
       }
       return;
     }
@@ -157,19 +177,7 @@
       !widthBecameUnknown;
 
     if (isHeightOnlyUpdate) {
-      pendingHeight = height;
-      if (pendingTimeoutId != null) {
-        clearTimeout(pendingTimeoutId);
-      }
-      pendingTimeoutId = setTimeout(() => {
-        pendingTimeoutId = null;
-        if (pendingHeight == null) {
-          return;
-        }
-        const heightToApply = pendingHeight;
-        pendingHeight = null;
-        applyViewportHeight(heightToApply);
-      }, HEIGHT_UPDATE_DELAY_MS);
+      schedulePendingHeightUpdate(height);
       return;
     }
 

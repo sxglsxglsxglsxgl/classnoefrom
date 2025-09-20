@@ -126,6 +126,17 @@
     });
   };
 
+  const applyViewportEffectsHeight = (value) => {
+    if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) {
+      return;
+    }
+
+    const nextValue = `${value / 100}px`;
+    if (root.style.getPropertyValue('--viewport-effects-unit') !== nextValue) {
+      root.style.setProperty('--viewport-effects-unit', nextValue);
+    }
+  };
+
   const applyViewportHeight = (value, { lock = true } = {}) => {
     lastViewportHeight = value;
     if (lock) {
@@ -135,6 +146,7 @@
     if (root.style.getPropertyValue('--viewport-unit') !== nextValue) {
       root.style.setProperty('--viewport-unit', nextValue);
     }
+    applyViewportEffectsHeight(value);
     broadcastViewportHeight(value);
   };
 
@@ -177,6 +189,8 @@
       scheduleRetry();
       return;
     }
+
+    applyViewportEffectsHeight(height);
 
     if (pendingFrame != null) {
       cancelAnimationFrame(pendingFrame);
@@ -384,6 +398,7 @@
       window.removeEventListener('pagehide', handlePageHide);
       lockedViewportHeight = null;
       root.style.removeProperty('--viewport-unit');
+      root.style.removeProperty('--viewport-effects-unit');
     };
 
     window.addEventListener('pagehide', handlePageHide, { once: true });

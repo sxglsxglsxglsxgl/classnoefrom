@@ -6,7 +6,34 @@
   const supportsDynamicViewport =
     hasCSSSupports && (CSS.supports('height: 100dvh') || CSS.supports('height: 100svh'));
 
-  if (supportsDynamicViewport) {
+  const shouldForceDynamicViewportPolyfill = (() => {
+    if (typeof navigator !== 'object') {
+      return false;
+    }
+
+    const userAgent = typeof navigator.userAgent === 'string' ? navigator.userAgent : '';
+    const platform = typeof navigator.platform === 'string' ? navigator.platform : '';
+    const maxTouchPoints =
+      typeof navigator.maxTouchPoints === 'number' ? navigator.maxTouchPoints : 0;
+
+    const isAppleDevice =
+      /(iPad|iPhone|iPod)/i.test(platform) ||
+      /(iPad|iPhone|iPod)/i.test(userAgent) ||
+      (platform === 'MacIntel' && maxTouchPoints > 1);
+
+    if (!isAppleDevice) {
+      return false;
+    }
+
+    const isAppleWebKit = /AppleWebKit/i.test(userAgent);
+    if (!isAppleWebKit) {
+      return false;
+    }
+
+    return true;
+  })();
+
+  if (supportsDynamicViewport && !shouldForceDynamicViewportPolyfill) {
     return;
   }
 

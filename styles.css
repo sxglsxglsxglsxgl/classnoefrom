@@ -124,8 +124,8 @@ body::after {
     );
   background-position:
     center calc(var(--overscroll-effects-bleed) + var(--safe-area-top) + var(--browser-chrome-top)),
-    center calc(100% - (var(--overscroll-effects-bleed) + var(--safe-area-bottom) + var(--browser-chrome-bottom))),
-    center calc(100% - (var(--overscroll-effects-bleed) + var(--safe-area-bottom) + var(--browser-chrome-bottom)));
+    center calc(100% - (var(--overscroll-effects-bleed) + var(--safe-area-top) + var(--browser-chrome-bottom))),
+    center calc(100% - (var(--overscroll-effects-bleed) + var(--safe-area-top) + var(--browser-chrome-bottom)));
   background-repeat: no-repeat;
   background-size:
     100% calc(clamp(160px, calc(var(--viewport-effects-unit) * 34), 360px) + var(--safe-area-top) + var(--browser-chrome-top)),

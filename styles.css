@@ -13,6 +13,8 @@
   --safe-area-right: env(safe-area-inset-right);
   --safe-area-bottom: env(safe-area-inset-bottom);
   --safe-area-left: env(safe-area-inset-left);
+  --browser-chrome-top: 0px;
+  --browser-chrome-bottom: 0px;
   --font-brand: 'Outfit', 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont,
     'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
   --font-serif: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
@@ -89,9 +91,9 @@ body.is-menu-closing {
 body::before {
   content: '';
   position: fixed;
-  inset: calc(var(--overscroll-effects-bleed) * -1 - var(--safe-area-top))
+  inset: calc(var(--overscroll-effects-bleed) * -1 - var(--safe-area-top) - var(--browser-chrome-top))
     calc(var(--overscroll-effects-bleed) * -1 - var(--safe-area-right))
-    calc(var(--overscroll-effects-bleed) * -1 - var(--safe-area-bottom))
+    calc(var(--overscroll-effects-bleed) * -1 - var(--safe-area-bottom) - var(--browser-chrome-bottom))
     calc(var(--overscroll-effects-bleed) * -1 - var(--safe-area-left));
   background: radial-gradient(120% 70% at 50% 0%, rgba(255, 244, 230, 0.1), rgba(5, 5, 5, 0)),
     radial-gradient(80% 60% at 80% 25%, rgba(248, 230, 210, 0.08), rgba(5, 5, 5, 0)),
@@ -104,9 +106,9 @@ body::before {
 body::after {
   content: '';
   position: fixed;
-  inset: calc(var(--overscroll-effects-bleed) * -1 - var(--safe-area-top))
+  inset: calc(var(--overscroll-effects-bleed) * -1 - var(--safe-area-top) - var(--browser-chrome-top))
     calc(var(--safe-area-right) * -1)
-    calc(var(--overscroll-effects-bleed) * -1 - var(--safe-area-bottom))
+    calc(var(--overscroll-effects-bleed) * -1 - var(--safe-area-bottom) - var(--browser-chrome-bottom))
     calc(var(--safe-area-left) * -1);
   pointer-events: none;
   z-index: 2;
@@ -121,21 +123,25 @@ body::after {
       rgba(5, 5, 5, 0) 100%
     );
   background-position:
-    center calc(var(--overscroll-effects-bleed) + var(--safe-area-top)),
-    center calc(100% - (var(--overscroll-effects-bleed) + var(--safe-area-bottom))),
-    center calc(100% - (var(--overscroll-effects-bleed) + var(--safe-area-bottom)));
+    center calc(var(--overscroll-effects-bleed) + var(--safe-area-top) + var(--browser-chrome-top)),
+    center calc(100% - (var(--overscroll-effects-bleed) + var(--safe-area-bottom) + var(--browser-chrome-bottom))),
+    center calc(100% - (var(--overscroll-effects-bleed) + var(--safe-area-bottom) + var(--browser-chrome-bottom)));
   background-repeat: no-repeat;
   background-size:
-    100% calc(clamp(160px, calc(var(--viewport-effects-unit) * 34), 360px) + var(--safe-area-top)),
-    100% calc(clamp(160px, calc(var(--viewport-effects-unit) * 34), 360px) + var(--safe-area-bottom)),
-    100% calc(clamp(200px, calc(var(--viewport-effects-unit) * 42), 420px) + var(--safe-area-bottom));
+    100% calc(clamp(160px, calc(var(--viewport-effects-unit) * 34), 360px) + var(--safe-area-top) + var(--browser-chrome-top)),
+    100% calc(
+      clamp(160px, calc(var(--viewport-effects-unit) * 34), 360px) + var(--safe-area-bottom) + var(--browser-chrome-bottom)
+    ),
+    100% calc(
+      clamp(200px, calc(var(--viewport-effects-unit) * 42), 420px) + var(--safe-area-bottom) + var(--browser-chrome-bottom)
+    );
 }
 
 .backdrop {
   position: fixed;
-  inset: calc(var(--overscroll-effects-bleed) * -1 - var(--safe-area-top))
+  inset: calc(var(--overscroll-effects-bleed) * -1 - var(--safe-area-top) - var(--browser-chrome-top))
     calc(var(--safe-area-right) * -1)
-    calc(var(--overscroll-effects-bleed) * -1 - var(--safe-area-bottom))
+    calc(var(--overscroll-effects-bleed) * -1 - var(--safe-area-bottom) - var(--browser-chrome-bottom))
     calc(var(--safe-area-left) * -1);
   background: rgba(5, 5, 5, 0.82);
   pointer-events: none;
@@ -188,9 +194,9 @@ body.is-menu-closing .site-menu-toggle {
 
 .site-menu {
   position: fixed;
-  inset: calc(var(--overscroll-bleed) * -1 - var(--safe-area-top))
+  inset: calc(var(--overscroll-bleed) * -1 - var(--safe-area-top) - var(--browser-chrome-top))
     calc(var(--safe-area-right) * -1)
-    calc(var(--overscroll-bleed) * -1 - var(--safe-area-bottom))
+    calc(var(--overscroll-bleed) * -1 - var(--safe-area-bottom) - var(--browser-chrome-bottom))
     calc(var(--safe-area-left) * -1);
   --site-menu-padding-block: clamp(32px, 6vw, 96px);
   --site-menu-padding-inline: clamp(32px, 6vw, 96px);
@@ -198,8 +204,8 @@ body.is-menu-closing .site-menu-toggle {
   place-items: center;
   padding-block: var(--site-menu-padding-block);
   padding-inline: var(--site-menu-padding-inline);
-  padding-block-start: calc(var(--site-menu-padding-block) + var(--safe-area-top));
-  padding-block-end: calc(var(--site-menu-padding-block) + var(--safe-area-bottom));
+  padding-block-start: calc(var(--site-menu-padding-block) + var(--safe-area-top) + var(--browser-chrome-top));
+  padding-block-end: calc(var(--site-menu-padding-block) + var(--safe-area-bottom) + var(--browser-chrome-bottom));
   background: rgba(5, 5, 5, 0.82);
   backdrop-filter: blur(28px);
   z-index: 10;
@@ -240,15 +246,23 @@ body.is-menu-closing .site-menu {
   --site-menu-container-margin-block: clamp(40px, calc(var(--viewport-unit) * 10), 160px);
   padding-block: var(--site-menu-container-padding-block);
   padding-inline: var(--site-menu-container-padding-inline);
-  padding-block-start: calc(var(--site-menu-container-padding-block) + var(--safe-area-top));
-  padding-block-end: calc(var(--site-menu-container-padding-block) + var(--safe-area-bottom));
+  padding-block-start: calc(
+    var(--site-menu-container-padding-block) + var(--safe-area-top) + var(--browser-chrome-top)
+  );
+  padding-block-end: calc(
+    var(--site-menu-container-padding-block) + var(--safe-area-bottom) + var(--browser-chrome-bottom)
+  );
   border-radius: clamp(28px, 6vw, 48px);
   background: rgba(8, 8, 8, 0.82);
   box-shadow: 0 32px 120px rgba(0, 0, 0, 0.6);
   pointer-events: auto;
   margin-block: var(--site-menu-container-margin-block);
-  margin-block-start: calc(var(--site-menu-container-margin-block) + var(--safe-area-top));
-  margin-block-end: calc(var(--site-menu-container-margin-block) + var(--safe-area-bottom));
+  margin-block-start: calc(
+    var(--site-menu-container-margin-block) + var(--safe-area-top) + var(--browser-chrome-top)
+  );
+  margin-block-end: calc(
+    var(--site-menu-container-margin-block) + var(--safe-area-bottom) + var(--browser-chrome-bottom)
+  );
 }
 
 .site-menu__container:focus,
@@ -314,8 +328,10 @@ main {
   --site-header-padding-inline: clamp(24px, 6vw, 60px);
   padding-block: var(--site-header-padding-block);
   padding-inline: var(--site-header-padding-inline);
-  padding-block-start: calc(var(--site-header-padding-block) + var(--safe-area-top));
-  padding-block-end: calc(var(--site-header-padding-block) + var(--safe-area-bottom));
+  padding-block-start: calc(var(--site-header-padding-block) + var(--safe-area-top) + var(--browser-chrome-top));
+  padding-block-end: calc(
+    var(--site-header-padding-block) + var(--safe-area-bottom) + var(--browser-chrome-bottom)
+  );
   z-index: 32;
 }
 
@@ -381,7 +397,7 @@ body.is-menu-closing .site-lockup {
 
 .site-menu-toggle {
   position: fixed;
-  top: calc(clamp(24px, 4vw, 48px) + var(--safe-area-top));
+  top: calc(clamp(24px, 4vw, 48px) + var(--safe-area-top) + var(--browser-chrome-top));
   right: calc(clamp(24px, 4vw, 48px) + var(--safe-area-right));
   display: inline-flex;
   align-items: center;
@@ -475,8 +491,10 @@ body.is-menu-closing .site-menu-toggle__icon span:nth-child(3) {
   --sentences-padding-top: clamp(48px, calc(var(--viewport-unit) * 22), 200px);
   --sentences-padding-bottom: clamp(200px, calc(var(--viewport-unit) * 52), 420px);
   --sentences-padding-inline: clamp(24px, 8vw, 140px);
-  padding-top: calc(var(--sentences-padding-top) + var(--safe-area-top));
-  padding-bottom: calc(var(--sentences-padding-bottom) + var(--safe-area-bottom));
+  padding-top: calc(var(--sentences-padding-top) + var(--safe-area-top) + var(--browser-chrome-top));
+  padding-bottom: calc(
+    var(--sentences-padding-bottom) + var(--safe-area-bottom) + var(--browser-chrome-bottom)
+  );
   padding-inline: var(--sentences-padding-inline);
   perspective: 1400px;
 }
@@ -531,7 +549,9 @@ body.is-menu-closing .site-menu-toggle__icon span:nth-child(3) {
   --site-footer-padding-bottom: clamp(60px, calc(var(--viewport-unit) * 18), 160px);
   --site-footer-padding-inline: clamp(24px, 8vw, 160px);
   padding-top: var(--site-footer-padding-top);
-  padding-bottom: calc(var(--site-footer-padding-bottom) + var(--safe-area-bottom));
+  padding-bottom: calc(
+    var(--site-footer-padding-bottom) + var(--safe-area-bottom) + var(--browser-chrome-bottom)
+  );
   padding-inline: var(--site-footer-padding-inline);
   color: var(--text-muted);
 }
@@ -594,7 +614,7 @@ body.is-menu-closing .site-menu-toggle__icon span:nth-child(3) {
   }
 
   .site-menu-toggle {
-    top: calc(clamp(20px, 9vw, 36px) + var(--safe-area-top));
+    top: calc(clamp(20px, 9vw, 36px) + var(--safe-area-top) + var(--browser-chrome-top));
     right: calc(clamp(20px, 9vw, 36px) + var(--safe-area-right));
     width: clamp(40px, 14vw, 52px);
     height: clamp(40px, 14vw, 52px);

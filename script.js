@@ -127,6 +127,7 @@
   };
 
   const toViewportUnit = (value) => `${value / 100}px`;
+  const toPixelValue = (value) => `${value}px`;
 
   const resolveLockedEffectsHeight = (value) => {
     const lockedHeight =
@@ -219,6 +220,39 @@
     }
 
     applyViewportEffectsHeight(height);
+
+    const visualViewport = window.visualViewport;
+    let browserChromeTop = 0;
+    let browserChromeBottom = 0;
+
+    if (visualViewport) {
+      const offsetTopRaw = visualViewport.offsetTop;
+      const offsetTop =
+        typeof offsetTopRaw === 'number' && Number.isFinite(offsetTopRaw)
+          ? Math.max(0, offsetTopRaw)
+          : 0;
+      const layoutHeightRaw = window.innerHeight;
+      const layoutHeight =
+        typeof layoutHeightRaw === 'number' && Number.isFinite(layoutHeightRaw) ? layoutHeightRaw : height;
+      const visualViewportHeightRaw = visualViewport.height;
+      const visualViewportHeight =
+        typeof visualViewportHeightRaw === 'number' && Number.isFinite(visualViewportHeightRaw)
+          ? visualViewportHeightRaw
+          : height;
+
+      browserChromeTop = offsetTop;
+      browserChromeBottom = Math.max(0, layoutHeight - visualViewportHeight - offsetTop);
+    }
+
+    const browserChromeTopValue = toPixelValue(browserChromeTop);
+    if (root.style.getPropertyValue('--browser-chrome-top') !== browserChromeTopValue) {
+      root.style.setProperty('--browser-chrome-top', browserChromeTopValue);
+    }
+
+    const browserChromeBottomValue = toPixelValue(browserChromeBottom);
+    if (root.style.getPropertyValue('--browser-chrome-bottom') !== browserChromeBottomValue) {
+      root.style.setProperty('--browser-chrome-bottom', browserChromeBottomValue);
+    }
 
     if (pendingFrame != null) {
       cancelAnimationFrame(pendingFrame);
@@ -427,6 +461,8 @@
       lockedViewportHeight = null;
       root.style.removeProperty('--viewport-unit');
       root.style.removeProperty('--viewport-effects-unit');
+      root.style.removeProperty('--browser-chrome-top');
+      root.style.removeProperty('--browser-chrome-bottom');
     };
 
     window.addEventListener('pagehide', handlePageHide, { once: true });

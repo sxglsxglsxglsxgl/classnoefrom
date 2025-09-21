@@ -584,6 +584,13 @@
 
   function updateActiveSentence() {
     const viewportHeight = getStableViewportHeight();
+    const visualViewport = typeof window !== 'undefined' ? window.visualViewport : null;
+    const viewportOffsetTop =
+      typeof visualViewport === 'object' &&
+      typeof visualViewport.offsetTop === 'number' &&
+      Number.isFinite(visualViewport.offsetTop)
+        ? visualViewport.offsetTop
+        : 0;
     const revealOffset = viewportHeight * 0.3;
     const viewportCenter = viewportHeight / 2;
     let nextIndex = -1;
@@ -591,14 +598,16 @@
 
     nodes.forEach((node, index) => {
       const rect = node.getBoundingClientRect();
+      const adjustedTop = rect.top - viewportOffsetTop;
+      const adjustedBottom = rect.bottom - viewportOffsetTop;
       const isIntersecting =
-        rect.bottom > -revealOffset && rect.top < viewportHeight + revealOffset;
+        adjustedBottom > -revealOffset && adjustedTop < viewportHeight + revealOffset;
 
       if (!isIntersecting) {
         return;
       }
 
-      const nodeCenter = rect.top + rect.height / 2;
+      const nodeCenter = adjustedTop + rect.height / 2;
       const distance = Math.abs(nodeCenter - viewportCenter);
 
       if (distance < smallestDistance) {

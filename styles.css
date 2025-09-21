@@ -544,6 +544,28 @@ body.is-menu-closing .site-menu-toggle__icon span:nth-child(3) {
   transform: translate3d(0, 0, 0) scale(1);
 }
 
+@supports (-webkit-touch-callout: none) {
+  #sentences {
+    perspective: none;
+  }
+
+  .sentence {
+    transform: translateY(160px) scale(0.74);
+  }
+
+  .sentence.is-visible {
+    transform: translateY(80px) scale(0.83);
+  }
+
+  .sentence.is-past {
+    transform: translateY(-60px) scale(0.78);
+  }
+
+  .sentence.is-active {
+    transform: translateY(0) scale(1);
+  }
+}
+
 .site-footer {
   --site-footer-padding-top: clamp(80px, calc(var(--viewport-unit) * 18), 140px);
   --site-footer-padding-bottom: clamp(60px, calc(var(--viewport-unit) * 18), 160px);

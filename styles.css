@@ -677,6 +677,17 @@ body.is-menu-closing .site-menu-toggle__icon span:nth-child(3) {
     background: #050505;
   }
 
+  body.has-menu-open main,
+  body.has-menu-open footer,
+  body.has-menu-open .backdrop,
+  body.is-menu-closing main,
+  body.is-menu-closing footer,
+  body.is-menu-closing .backdrop {
+    filter: none !important;
+    opacity: 1 !important;
+    transition: none !important;
+  }
+
   .site-menu {
     background: #050505;
     backdrop-filter: none;

@@ -677,6 +677,12 @@ body.is-menu-closing .site-menu-toggle__icon span:nth-child(3) {
     background: #050505;
   }
 
+  .backdrop::after {
+    opacity: 0;
+    mix-blend-mode: normal;
+    background-image: none;
+  }
+
   body.has-menu-open main,
   body.has-menu-open footer,
   body.has-menu-open .backdrop,
@@ -695,5 +701,18 @@ body.is-menu-closing .site-menu-toggle__icon span:nth-child(3) {
 
   .site-menu__container {
     background: #050505;
+  }
+
+  .sentence,
+  .sentence.is-visible,
+  .sentence.is-past,
+  .sentence.is-active {
+    filter: none;
+    opacity: 1;
+    transition: none;
+  }
+
+  .sentence {
+    will-change: auto;
   }
 }

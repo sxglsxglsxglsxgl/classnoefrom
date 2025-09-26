@@ -9,16 +9,34 @@
   --viewport-effects-unit: 1vh;
   --overscroll-bleed: clamp(120px, calc(var(--viewport-unit) * 16), 240px);
   --overscroll-effects-bleed: clamp(120px, calc(var(--viewport-effects-unit) * 16), 240px);
-  --safe-area-top: env(safe-area-inset-top);
-  --safe-area-right: env(safe-area-inset-right);
-  --safe-area-bottom: env(safe-area-inset-bottom);
-  --safe-area-left: env(safe-area-inset-left);
+  --safe-area-top: 0px;
+  --safe-area-right: 0px;
+  --safe-area-bottom: 0px;
+  --safe-area-left: 0px;
   --browser-chrome-top: 0px;
   --browser-chrome-bottom: 0px;
   --font-brand: 'Outfit', 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont,
     'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
   --font-serif: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
   --font-sans: 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
+}
+
+@supports (padding: constant(safe-area-inset-top)) {
+  :root {
+    --safe-area-top: constant(safe-area-inset-top);
+    --safe-area-right: constant(safe-area-inset-right);
+    --safe-area-bottom: constant(safe-area-inset-bottom);
+    --safe-area-left: constant(safe-area-inset-left);
+  }
+}
+
+@supports (padding: env(safe-area-inset-top)) {
+  :root {
+    --safe-area-top: env(safe-area-inset-top);
+    --safe-area-right: env(safe-area-inset-right);
+    --safe-area-bottom: env(safe-area-inset-bottom);
+    --safe-area-left: env(safe-area-inset-left);
+  }
 }
 
 @supports (height: 100svh) {
@@ -204,6 +222,8 @@ body.is-menu-closing .site-menu-toggle {
   place-items: center;
   padding-block: var(--site-menu-padding-block);
   padding-inline: var(--site-menu-padding-inline);
+  padding-inline-start: calc(var(--site-menu-padding-inline) + var(--safe-area-left));
+  padding-inline-end: calc(var(--site-menu-padding-inline) + var(--safe-area-right));
   padding-block-start: calc(var(--site-menu-padding-block) + var(--safe-area-top) + var(--browser-chrome-top));
   padding-block-end: calc(var(--site-menu-padding-block) + var(--safe-area-bottom) + var(--browser-chrome-bottom));
   background: rgba(5, 5, 5, 0.82);
@@ -246,6 +266,8 @@ body.is-menu-closing .site-menu {
   --site-menu-container-margin-block: clamp(40px, calc(var(--viewport-unit) * 10), 160px);
   padding-block: var(--site-menu-container-padding-block);
   padding-inline: var(--site-menu-container-padding-inline);
+  padding-inline-start: calc(var(--site-menu-container-padding-inline) + var(--safe-area-left));
+  padding-inline-end: calc(var(--site-menu-container-padding-inline) + var(--safe-area-right));
   padding-block-start: calc(
     var(--site-menu-container-padding-block) + var(--safe-area-top) + var(--browser-chrome-top)
   );
@@ -328,6 +350,8 @@ main {
   --site-header-padding-inline: clamp(24px, 6vw, 60px);
   padding-block: var(--site-header-padding-block);
   padding-inline: var(--site-header-padding-inline);
+  padding-inline-start: calc(var(--site-header-padding-inline) + var(--safe-area-left));
+  padding-inline-end: calc(var(--site-header-padding-inline) + var(--safe-area-right));
   padding-block-start: calc(var(--site-header-padding-block) + var(--safe-area-top) + var(--browser-chrome-top));
   padding-block-end: calc(
     var(--site-header-padding-block) + var(--safe-area-bottom) + var(--browser-chrome-bottom)
@@ -496,6 +520,8 @@ body.is-menu-closing .site-menu-toggle__icon span:nth-child(3) {
     var(--sentences-padding-bottom) + var(--safe-area-bottom) + var(--browser-chrome-bottom)
   );
   padding-inline: var(--sentences-padding-inline);
+  padding-inline-start: calc(var(--sentences-padding-inline) + var(--safe-area-left));
+  padding-inline-end: calc(var(--sentences-padding-inline) + var(--safe-area-right));
   perspective: 1400px;
 }
 
@@ -538,6 +564,8 @@ body.is-menu-closing .site-menu-toggle__icon span:nth-child(3) {
     var(--site-footer-padding-bottom) + var(--safe-area-bottom) + var(--browser-chrome-bottom)
   );
   padding-inline: var(--site-footer-padding-inline);
+  padding-inline-start: calc(var(--site-footer-padding-inline) + var(--safe-area-left));
+  padding-inline-end: calc(var(--site-footer-padding-inline) + var(--safe-area-right));
   color: var(--text-muted);
 }
 
